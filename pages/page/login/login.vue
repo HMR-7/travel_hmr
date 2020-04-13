@@ -122,10 +122,6 @@ export default {
   onLoad() {
     let t = this;
     console.log(111);
-    // let data = {
-    //   page: 1,
-    //   limit: 10
-    // };
     t.$utils.ajax(t.$api.detail, "get", "", res => {
       console.log(res);
     });
