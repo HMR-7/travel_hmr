@@ -1,0 +1,490 @@
+<template>
+  <view class="content">
+    <view class="title iconfont icon-lvyou1"></view>
+    <view class="userCenter">
+      <!-- 用户名 -->
+      <!-- <view :class="isFoucs==2?'name inputFoucs':'name'">
+        <view class="nameIcon">
+          <view class="iconfont iconNameCard"></view>
+        </view>
+        <input
+          class="write"
+          type="text"
+          placeholder="请输入用户名"
+          v-model="userName"
+          @focus="isFoucs=2"
+          @blur="isFoucs=0"
+        />
+      </view>-->
+      <!-- 手机号 -->
+      <view :class="isFoucs==1?'phone inputFoucs':'phone'">
+        <view class="numberIcon">
+          <view class="iconfont icon-shouji"></view>
+          <view
+            style="height:100rpx;line-height:100rpx;padding:0 20rpx;font-size:30rpx;
+        "
+          >+86</view>
+        </view>
+        <input
+          class="write"
+          type="number"
+          maxlength="11"
+          placeholder="请输入手机号"
+          v-model="phone"
+          @focus="isFoucs=1"
+          @blur="isFoucs=0"
+          @input="getNumberLength(phone)"
+        />
+        <view
+          :class="isCodeActive==1?'codeActive animated bounceIn':'code'"
+          @click="toSend"
+        >{{content}}</view>
+      </view>
+
+      <!-- 验证码 -->
+      <view :class="isFoucs==3?'testCode inputFoucs':'testCode'">
+        <view class="codeIcon">
+          <view class="iconfont icon-yanzhengma-copy"></view>
+        </view>
+        <view>
+          <input
+            class="write"
+            type="number"
+            placeholder="请输入验证码"
+            v-model="userCode"
+            @focus="isFoucs=3"
+            @blur="isFoucs=0"
+          />
+        </view>
+      </view>
+      <!-- 登录按钮 -->
+      <button
+        open-type="getUserInfo"
+        @getuserinfo="getUserInfo"
+        :class="isConfirmActive==1?'confirmActive animated bounceIn':'confirm'"
+        @tap="toLogin(userName,userPhone,userCode)"
+        hover-start-time="5000"
+      >登录</button>
+    </view>
+  </view>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      userPhone: "", //用户手机号
+      userName: "", //用户名
+      userCode: "", //验证码
+      code: "", //登录code码
+      ischecked: true, //是否显示授权按钮
+      userRes: "", //授权后获取的用户信息
+      time: 15, //验证码倒计时时间
+      timeStart: true, //防止发送重复点击
+      content: "发送验证码",
+      isFoucs: 0, //选择input框时，显示下划线样式
+      isCodeActive: 0, //验证码按钮是否被启用
+      isConfirmActive: 0, //登录按钮是否被启用
+      ifEnd: "" //监听3个input框是否都含有值
+    };
+  },
+  computed: {
+    endVal: function() {
+      let t = this;
+      t.ifEnd =
+        // Number(Boolean(t.userName)) +
+        Number(Boolean(t.userPhone)) + Number(Boolean(t.userCode));
+    }
+  },
+  watch: {
+    ifEnd(newVal, oldVal) {
+      let t = this;
+      if (Number(newVal) === 2) {
+        t.isConfirmActive = 1;
+        console.log(t.isConfirmActive, "t.isConfirmActive");
+      } else {
+        t.isConfirmActive = 0;
+      }
+    }
+  },
+  onPullDownRefresh() {},
+  created() {
+    let t = this;
+    let authSetting_userInfo = uni.getStorageSync("authSetting.userInfo");
+    let userInfo = uni.getStorageSync("userInfo");
+    console.log(authSetting_userInfo, "------");
+    console.log(userInfo);
+    // if (authSetting_userInfo && userInfo) {
+    //   console.log('已经登录过');
+    // }
+    t.checkLogin();
+  },
+  onLoad() {
+    let t = this;
+    console.log(111);
+    // let data = {
+    //   page: 1,
+    //   limit: 10
+    // };
+    t.$utils.ajax(t.$api.detail, "get", "", res => {
+      console.log(res);
+    });
+    // uni.request({
+    //   url: t.$api.detail, //仅为示例，并非真实接口地址。
+    //   data: { page: 1, limit: 10 },
+    //   method: "post",
+    //   header: {
+    //     "custom-header": "application/x-www-form-urlencoded" //自定义请求头信息
+    //   },
+    //   success: res => {
+    //     console.log(res.data);
+    //   }
+    // });
+  },
+  methods: {
+    // aj: function(a, method, data, resolve) {
+    //   console.log(a, "a");
+    //   console.log(method, "method");
+    //   console.log(data, "data");
+    //   console.log(resolve, "resolve");
+    //   if (!data) {
+    //     data = {};
+    //   }
+    //   uni.request({
+    //     url: a, //仅为示例，并非真实接口地址。
+    //     method: method,
+    //     data: data,
+    //     header: {
+    //       "custom-header": "application/x-www-form-urlencoded" //自定义请求头信息
+    //     },
+    //     success: res => {
+    //       console.log(res.data);
+    //     },
+    //     fail: err => {
+    //       console.log(err);
+    //     }
+    //   });
+    // },
+    /* 获取登录code码 */
+    checkLogin() {
+      let t = this;
+      uni.login({
+        provider: "weixin",
+        success: res => {
+          console.log(res, "res");
+          if (res.code) {
+            t.code = res.code;
+          } else {
+            console.log("登录失败", res.errMsg);
+          }
+        }
+      });
+    },
+    /* 授权登录 */
+    getUserInfo(e) {
+      let t = this,
+        authSetting_userInfo = uni.getStorageSync("authSetting.userInfo");
+      if (authSetting_userInfo == true) return;
+      this.$utils.getSetting(() => {
+        let t = this,
+          authSetting_userInfo = uni.getStorageSync("authSetting.userInfo");
+        console.log(authSetting_userInfo, "授权信息");
+        if (authSetting_userInfo == false) {
+          t.$utils.showToast("授权失败", "/static/img/settingFail.png");
+          t.ischecked = true;
+          return;
+        } else {
+          t.$utils.showToast("授权成功", "/static/img/settingSuccess.png");
+          t.userRes = e.detail.userInfo;
+          uni.setStorageSync("userInfo", t.userRes);
+          t.ischecked = false;
+          t.getNumberLength(t.userPhone);
+          // setTimeout(() => {
+          //   uni.hideToast();
+          //   uni.redirectTo({
+          //     url: "../index/index1"
+          //   });
+          // }, 1000);
+        }
+      });
+    },
+    /* 获取手机号长度 */
+    getNumberLength(phone) {
+      let t = this,
+        authSetting_userInfo = uni.getStorageSync("authSetting.userInfo");
+      t.userPhone = phone;
+      console.log(t.userPhone, "用户手机号");
+      if (phone.length == 11 && authSetting_userInfo == true) {
+        t.isCodeActive = 1;
+        return;
+      }
+      if (
+        phone.length == 11 &&
+        (!authSetting_userInfo || authSetting_userInfo == false)
+      ) {
+        t.isCodeActive = 1;
+        // t.$utils.showToast("请先授权登录", "/static/img/toSetting.png");
+        return;
+      } else {
+        t.isCodeActive = 0;
+      }
+    },
+    /* 发送验证码 */
+    toSend() {
+      let t = this,
+        authSetting_userInfo = uni.getStorageSync("authSetting.userInfo");
+      if (t.isCodeActive == 0 && authSetting_userInfo == true) {
+        t.$utils.showToast("号码格式错误", "/static/img/wrongPhone.png");
+        return;
+      }
+      if (
+        t.isCodeActive == 0 &&
+        (!authSetting_userInfo || authSetting_userInfo == false)
+      ) {
+        t.$utils.showToast("请先授权登录", "/static/img/toSetting.png");
+        return;
+      }
+
+      if (!t.timeStart) return; //防止重复点击
+      t.timeStart = false;
+      let block = setTimeout(() => {
+        t.isCodeActive = 0;
+      }, 500);
+      let clock = setInterval(() => {
+        t.time--;
+        t.content = t.time + "s后再试";
+        if (t.time < 0) {
+          //当倒计时小于0时清除定时器
+          clearInterval(clock);
+          clearTimeout(block);
+          t.content = "重发验证码";
+          t.time = 15;
+          t.timeStart = true;
+          t.getNumberLength(t.userPhone);
+          console.log(t.isCodeActive);
+        }
+      }, 500);
+    },
+    /* 验证登录 */
+    toLogin(name, phone, code) {
+      let t = this,
+        authSetting_userInfo = uni.getStorageSync("authSetting.userInfo");
+      if (!authSetting_userInfo || authSetting_userInfo == false) {
+        t.$utils.showToast("请先授权登录", "/static/img/toSetting.png");
+        return;
+      }
+      if (phone == "" || code == "") {
+        t.$utils.showToast("登录信息不全", "/static/img/megsLose.png");
+        return;
+      }
+      if (
+        // t.$utils.checkName(name) &&
+        t.$utils.checkPhone(phone) &&
+        t.$utils.checkCode(code)
+      ) {
+        // let data = {
+        //   iv: userRes.iv,
+        //   encryptedData: userRes.encryptedData,
+        //   code: t.code
+        // };
+        // if (data.iv) {
+        //   t.$utils.ajax(t.$page.userLogin, "post", data, res => {
+        //     if (res) {
+        //       uni.setStorageSync("userInfo", res);
+        //       t.$utils.showToast("登录成功");
+        //       uni.navigateTo({
+        //         url: "../index/index"
+        //       });
+        //     }
+        //   });
+        // } else {
+        //   t.$utils.showToast("登录失败");
+        // }
+        console.log(t.userRes);
+        t.$utils.showToast("验证通过", "/static/img/loginSuccess.png");
+        setTimeout(() => {
+          uni.hideToast();
+          uni.redirectTo({
+            url: "../index/index1"
+          });
+        }, 1000);
+      }
+    }
+  }
+};
+</script>
+
+<style lang="less">
+.content {
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+  background-color: var(--contentBgc);
+  /* 登录授权按钮样式 */
+  button {
+    position: static !important;
+    &::after {
+      width: 0;
+      height: 0;
+    }
+  }
+  .iconfont {
+    color: var(--themeColor);
+  }
+  /* 登录页Login */
+  .title {
+    width: 100%;
+    height: 340rpx;
+    line-height: 200rpx;
+    text-align: center;
+    background-color: var(--themeColor);
+    color: #fff;
+    font-size: 100rpx;
+  }
+  /* 用户操作区域 */
+  .userCenter {
+    position: fixed;
+    top: 200rpx;
+    left: 4%;
+    width: 92%;
+    border-radius: 20rpx;
+    box-sizing: border-box;
+    background-color: #fff;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); /*阴影/
+    /* 用户名 */
+    .name {
+      margin: 0rpx 40rpx 20rpx 40rpx;
+      display: flex;
+      justify-content: row;
+      border-bottom: 2rpx solid #ebebeb;
+      /* 用户名图标样式 */
+      .nameIcon {
+        display: flex;
+        justify-content: row;
+        margin: auto 0;
+        text-align: center;
+        .iconNameCard {
+          padding: 0 20rpx;
+          height: 100rpx;
+          line-height: 100rpx;
+          font-size: 50rpx;
+        }
+      }
+    }
+    /* 手机 */
+    .phone {
+      margin: 0 40rpx 20rpx 40rpx;
+      display: flex;
+      justify-content: row;
+      border-bottom: 2rpx solid #ebebeb;
+      .numberIcon {
+        display: flex;
+        justify-content: row;
+        margin: auto 0;
+        font-size: var(--titleSize);
+        text-align: center;
+      }
+      .code {
+        margin: auto 0;
+        margin-right: 20rpx;
+        width: 350rpx;
+        height: 60rpx;
+        line-height: 60rpx;
+        font-size: 22rpx;
+        text-align: center;
+        color: var(--remarksFontColor);
+        background-color: var(--remarksColor);
+        border-radius: 10rpx;
+      }
+      .codeActive {
+        margin: auto 0;
+        margin-right: 20rpx;
+        width: 350rpx;
+        height: 60rpx;
+        line-height: 60rpx;
+        font-size: 22rpx;
+        text-align: center;
+        border-radius: 10rpx;
+        color: #fff;
+        background-color: var(--themeColor);
+      }
+      .icon-shouji {
+        padding-left: 20rpx;
+        height: 100rpx;
+        line-height: 100rpx;
+        font-size: 50rpx;
+      }
+      .item {
+        width: 50rpx;
+        height: 50rpx;
+      }
+    }
+    /* 验证码 */
+    .testCode {
+      margin: 0 40rpx 20rpx 40rpx;
+      display: flex;
+      justify-content: row;
+      border-bottom: 2rpx solid #ebebeb;
+      .codeIcon {
+        display: flex;
+        justify-content: row;
+        margin: auto 0;
+        text-align: center;
+      }
+      .icon-yanzhengma-copy {
+        padding: 0 20rpx;
+        height: 100rpx;
+        line-height: 100rpx;
+        font-size: 50rpx;
+      }
+    }
+    /* input框样式 */
+    .write {
+      width: 100%;
+      height: 100rpx;
+    }
+    /* input聚焦后样式 */
+    .inputFoucs {
+      border-bottom: 2rpx solid #0ea391;
+    }
+    /* 按钮可用样式 */
+    .confirmActive {
+      margin: 40rpx;
+      height: 70rpx;
+      line-height: 70rpx;
+      text-align: center;
+      color: #fff;
+      font-size: var(--titleSize);
+      font-weight: bold;
+      background-color: var(--themeColor);
+      border-radius: 10rpx;
+    }
+    /* 按钮禁用样式 */
+    .confirm {
+      margin: 40rpx 40rpx 20rpx 40rpx;
+      height: 70rpx;
+      line-height: 70rpx;
+      text-align: center;
+      color: var(--remarksFontColor);
+      font-size: var(--titleSize);
+      // font-weight: bold;
+      background-color: var(--remarksColor);
+      border-radius: 10rpx;
+    }
+    /* 授权用户登录样式 */
+    .authorization {
+      margin: 0 40rpx;
+      margin-bottom: 40rpx;
+      height: 70rpx;
+      line-height: 70rpx;
+      text-align: center;
+      color: var(--themeColor);
+      font-size: var(--titleSize);
+      font-weight: bold;
+      background-color: #fff;
+      border: 2rpx solid;
+      border-radius: 10rpx;
+    }
+  }
+}
+</style>
