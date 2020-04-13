@@ -113,21 +113,6 @@ export default {
 
     console.log(t.goodsList, "goodsListgoodsList");
   },
-  onShow() {
-    let t = this;
-
-    t.currentIndex = -1;
-
-    if (t.userId) {
-      let data = {
-        user_id: t.userId
-      };
-      t.$utils.ajax(t.$page.userInfo, "get", data, res => {
-        console.log(res, "7777777777777777");
-        t.is_image_search = res.is_image_search;
-      });
-    }
-  },
 
   methods: {
     /* 一键复制 */
@@ -141,11 +126,11 @@ export default {
       let t = this,
         list = t.goodsList,
         page = t.page;
-      let data = {
-        page: page,
-        limit: 5
-      };
-      t.$utils.ajax(t.$api.detail, "get", data, res => {
+      // let data = {
+      //   page: page,
+      //   limit: 5
+      // };
+      t.$utils.ajax(t.$api.detail, "get", "", res => {
         /* 数组拼接 */
         console.log(res);
 

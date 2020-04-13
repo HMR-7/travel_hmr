@@ -79,7 +79,7 @@ export default {
       code: "", //登录code码
       ischecked: true, //是否显示授权按钮
       userRes: "", //授权后获取的用户信息
-      time: 15, //验证码倒计时时间
+      time: 20, //验证码倒计时时间
       timeStart: true, //防止发送重复点击
       content: "发送验证码",
       isFoucs: 0, //选择input框时，显示下划线样式
@@ -121,19 +121,8 @@ export default {
   },
   onLoad() {
     let t = this;
-    t.$utils.ajax(t.$api.detail, "get", "", res => {
-      console.log(res);
-    });
-    // uni.request({
-    //   url: t.$api.detail, //仅为示例，并非真实接口地址。
-    //   data: { page: 1, limit: 10 },
-    //   method: "post",
-    //   header: {
-    //     "custom-header": "application/x-www-form-urlencoded" //自定义请求头信息
-    //   },
-    //   success: res => {
-    //     console.log(res.data);
-    //   }
+    // t.$utils.ajax(t.$api.detail, "get", "", res => {
+    //   console.log(res);
     // });
   },
   methods: {
@@ -202,7 +191,8 @@ export default {
       }
     },
     /* 发送验证码 */
-    toSend() {
+    /* toSend() {
+      
       let t = this,
         authSetting_userInfo = uni.getStorageSync("authSetting.userInfo");
       if (t.isCodeActive == 0 && authSetting_userInfo == true) {
@@ -236,11 +226,51 @@ export default {
           console.log(t.isCodeActive);
         }
       }, 500);
+    }, */
+    toSend() {
+      let t = this;
+      if (t.isCodeActive == 0) {
+        console.log(t.isCodeActive, "1111");
+        return;
+      }
+      if (t.$utils.checkPhone(t.userPhone) == false) {
+        console.log(11111);
+        return;
+      }
+      for (var i = 0; i < 6; i++) {
+        var radom = Math.floor(Math.random() * 10);
+        console.log(radom);
+        t.code += `${radom}`;
+      }
+      t.$utils.showToast("您的验证码:" + t.code);
+      if (!t.timeStart) return; //防止重复点击
+      t.timeStart = false;
+      let block = setTimeout(() => {
+        t.isCodeActive = 0;
+      }, 1000);
+      let clock = setInterval(() => {
+        t.time--;
+        t.content = t.time + "s后再试";
+        if (t.time < 0) {
+          //当倒计时小于0时清除定时器
+          clearInterval(clock);
+          clearTimeout(block);
+          t.content = "重发验证码";
+          t.time = 20;
+          t.timeStart = true;
+          t.code = "";
+          t.isCodeActive = 1;
+          t.getNumberLength(t.userPhone);
+          console.log(t.isCodeActive);
+        }
+      }, 1000);
     },
     /* 验证登录 */
     toLogin(name, phone, code) {
       let t = this,
-        authSetting_userInfo = uni.getStorageSync("authSetting.userInfo");
+        authSetting_userInfo = uni.getStorageSync("authSetting.userInfo"),
+        userInfo = uni.getStorageSync("userInfo");
+      console.log(userInfo);
       if (!authSetting_userInfo || authSetting_userInfo == false) {
         t.$utils.showToast("请先授权登录", "/static/img/toSetting.png");
         return;
@@ -254,24 +284,16 @@ export default {
         t.$utils.checkPhone(phone) &&
         t.$utils.checkCode(code)
       ) {
-        // let data = {
-        //   iv: userRes.iv,
-        //   encryptedData: userRes.encryptedData,
-        //   code: t.code
-        // };
-        // if (data.iv) {
-        //   t.$utils.ajax(t.$page.userLogin, "post", data, res => {
-        //     if (res) {
-        //       uni.setStorageSync("userInfo", res);
-        //       t.$utils.showToast("登录成功");
-        //       uni.navigateTo({
-        //         url: "../index/index"
-        //       });
-        //     }
-        //   });
-        // } else {
-        //   t.$utils.showToast("登录失败");
-        // }
+        let data = {
+          userName: userInfo.nickName,
+          userPhone: phone
+        };
+        t.$utils.ajax(t.$api.userInfo, "post", data, res => {
+          console.log(res);
+          uni.redirectTo({
+            url: "../index/index"
+          });
+        });
         console.log(t.userRes);
         t.$utils.showToast("验证通过", "/static/img/loginSuccess.png");
         setTimeout(() => {

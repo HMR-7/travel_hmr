@@ -1,4 +1,4 @@
-import * as api from '../siteinfo/siteinfo'
+// import * as api from '../siteinfo/siteinfo'
 
 const utils = {
   getSetting: (fn) => {
