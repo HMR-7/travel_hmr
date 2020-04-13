@@ -121,7 +121,6 @@ export default {
   },
   onLoad() {
     let t = this;
-    console.log(111);
     t.$utils.ajax(t.$api.detail, "get", "", res => {
       console.log(res);
     });
@@ -138,29 +137,6 @@ export default {
     // });
   },
   methods: {
-    // aj: function(a, method, data, resolve) {
-    //   console.log(a, "a");
-    //   console.log(method, "method");
-    //   console.log(data, "data");
-    //   console.log(resolve, "resolve");
-    //   if (!data) {
-    //     data = {};
-    //   }
-    //   uni.request({
-    //     url: a, //仅为示例，并非真实接口地址。
-    //     method: method,
-    //     data: data,
-    //     header: {
-    //       "custom-header": "application/x-www-form-urlencoded" //自定义请求头信息
-    //     },
-    //     success: res => {
-    //       console.log(res.data);
-    //     },
-    //     fail: err => {
-    //       console.log(err);
-    //     }
-    //   });
-    // },
     /* 获取登录code码 */
     checkLogin() {
       let t = this;

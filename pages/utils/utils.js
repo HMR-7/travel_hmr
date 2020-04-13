@@ -183,6 +183,9 @@ const utils = {
       },
       success: (res) => {
         console.log(res.data);
+        if (resolve) {
+          resolve(res.data)
+        }
       },
       fail: (err) => {
         console.log(err);

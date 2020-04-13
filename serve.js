@@ -18,16 +18,16 @@ var conn = mysql.createConnection({
 //2.发送请求(查询)
 app.get("/detail", function (req, res) {
     console.log(req.query, 'get请求前端传递到后端的参数')
-    const sql = "SELECT * FROM detail limit 0,10"
+    let data = req.query;
+    let limit = Number(data.page - 1) * Number(data.limit);
+    const sql = "SELECT * FROM detail limit " + limit + "," + data.limit;
     conn.query(sql, function (err, result) {
         if (err) {
             console.log("连接失败", err);
         } else {
             let _res = JSON.stringify(result)
             let data = JSON.parse(_res)
-            res.send({
-                "res": data
-            });
+            res.send(data);
         }
     })
 });
