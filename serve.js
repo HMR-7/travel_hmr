@@ -7,14 +7,22 @@ var app = express();
 //     methods: ['get', 'post'],
 //     allowedHeaders: ['Content-Type', 'Authorization']
 // }))
-//连接数据库
+/* 家用数据库 */
 var conn = mysql.createConnection({
-    host: "192.168.88.121",
+    host: "192.168.1.106",
     port: "3306",
     user: "root",
     password: "123456",
     database: "travel"
 });
+//连接数据库
+/* var conn = mysql.createConnection({
+    host: "192.168.88.121",
+    port: "3306",
+    user: "root",
+    password: "123456",
+    database: "travel"
+}); */
 //2.发送请求(查询)
 /* 查询用户是否已经注册完毕， */
 app.get("/userInfo", function (req, res) {

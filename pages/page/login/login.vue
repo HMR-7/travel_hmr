@@ -101,7 +101,7 @@ export default {
     let userInfo = uni.getStorageSync("userInfo");
     let sysInfo = { phone: "17853558905", wxNum: "huangmaorui102117" };
     uni.setStorageSync("sysInfo", sysInfo);
-    
+
     console.log(authSetting_userInfo, "------");
     console.log(userInfo);
   },
@@ -211,14 +211,23 @@ export default {
         authSetting_userInfo = uni.getStorageSync("authSetting.userInfo");
       t.userPhone = phone;
       console.log(t.userPhone, "用户手机号");
-      if (phone.length == 11 && authSetting_userInfo == true) {
+      if (
+        phone.length == 11 &&
+        authSetting_userInfo == true &&
+        t.timeStart == true
+      ) {
         t.isCodeActive = 1;
+        console.log("11111111111");
+
         return;
       }
       if (
         phone.length == 11 &&
-        (!authSetting_userInfo || authSetting_userInfo == false)
+        (!authSetting_userInfo || authSetting_userInfo == false) &&
+        t.time == 0
       ) {
+        console.log(2222222);
+
         t.isCodeActive = 1;
         // t.$utils.showToast("请先授权登录", "/static/img/toSetting.png");
         return;

@@ -199,15 +199,7 @@ export default {
     background-color: #ffffff;
     box-sizing: border-box;
     /* 联想区域 */
-    .thinkArea {
-      position: fixed;
-      padding-top: 10rpx;
-      top: 80rpx;
-      left: 20rpx;
-      width: 620rpx;
-      border: 2rpx solid #ededed;
-      z-index: 10000;
-    }
+
     .searchListTitle {
       margin: 10rpx 0 10rpx 20rpx;
       color: #969799;
@@ -232,6 +224,15 @@ export default {
         background-color: #f5f5f9;
       }
     }
+  }
+  .thinkArea {
+    position: fixed;
+    padding-top: 10rpx;
+    top: 80rpx;
+    left: 20rpx;
+    width: 620rpx;
+    border: 2rpx solid #ededed;
+    z-index: 10000;
   }
 }
 </style>
