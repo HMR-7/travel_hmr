@@ -8,9 +8,45 @@
 				"navigationBarTextStyle": "white",
 				"enablePullDownRefresh": true,
 				"onReachBottomDistance": 50,
+				"usingComponents": {}
+			}
+		},
+		{
+			"path": "pages/page/index/search",
+			"style": {
+				"navigationBarTitleText": "搜索页面",
+				"navigationBarBackgroundColor": "#0ea391",
+				"navigationBarTextStyle": "white",
+				"enablePullDownRefresh": true,
+				"onReachBottomDistance": 50,
 				"usingComponents": {
 					"van-field": "/wxcomponents/vant/dist/field/index",
 					"van-count-down": "/wxcomponents/vant/dist/count-down/index"
+				}
+			}
+		},
+		{
+			"path": "pages/page/index/detail",
+			"style": {
+				"navigationBarTitleText": "景点信息",
+				"navigationBarBackgroundColor": "#0ea391",
+				"navigationBarTextStyle": "white",
+				"enablePullDownRefresh": true,
+				"usingComponents": {
+					"van-popup": "/wxcomponents/vant/dist/popup/index",
+					"van-rate": "/wxcomponents/vant/dist/rate/index"
+				}
+			}
+		}, {
+			"path": "pages/page/index/mine",
+			"style": {
+				"navigationBarTitleText": "个人中心",
+				"navigationBarBackgroundColor": "#0ea391",
+				"navigationBarTextStyle": "white",
+				"enablePullDownRefresh": true,
+				"onReachBottomDistance": 50,
+				"usingComponents": {
+					"van-popup": "/wxcomponents/vant/dist/popup/index"
 				}
 			}
 		},
@@ -34,5 +70,24 @@
 		"navigationBarTitleText": "uni-app",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar": {
+		"color": "#7A7E83",
+		"selectedColor": "#000000",
+		"borderStyle": "black",
+		"backgroundColor": "#ffffff",
+		"list": [{
+				"pagePath": "pages/page/index/index",
+				"text": "首页",
+				"iconPath": "static/images/index.png",
+				"selectedIconPath": "static/images/selIndex.png"
+			},
+			{
+				"pagePath": "pages/page/index/mine",
+				"text": "个人中心",
+				"iconPath": "static/images/mine.png",
+				"selectedIconPath": "static/images/selMine.png"
+			}
+		]
 	}
 }

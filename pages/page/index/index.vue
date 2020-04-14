@@ -9,7 +9,7 @@
             class="iconfont icon-sousuo"
             style="color:var(--detailColor);float:lef;line-height:54rpx; text-algin:center; margin-left:20rpx; font-size:36upx;width: 100%;"
           >
-            <text style="font-size:28rpx;padding-left:10rpx;">全棉布料</text>
+            <text style="font-size:28rpx;padding-left:10rpx;">景区、美食、酒店</text>
           </view>
           <span
             @tap="photoSearch"
@@ -18,13 +18,12 @@
             v-if="userId&&is_image_search"
           ></span>
         </view>
-        <view class="allClass" style="color:#fff;text-align:center" @tap="toClissifyList">
-          <view class="iconfont icon-all" style="font-size:40rpx;"></view>
+        <view class="allClass" style="color:#fff;text-align:center">
           <view style="font-size:24rpx;font-weight:bolder">搜索</view>
         </view>
       </view>
     </view>
-    <view class="listContent" style="padding-top:120rpx">
+    <view class="listContent" style="padding-top:100rpx">
       <view class="navList">
         <view class="nav" v-for="(item,index) in navList" :key="index">
           <view class="navImage">
@@ -40,7 +39,7 @@
           class="shop_details"
           v-for="(item,index) in goodsList"
           :key="index"
-          @click="toBuy(item.id)"
+          @click="toDetail(item.id)"
         >
           <view class="goods_image">
             <image :src="item.src" mode="modeFix" />
@@ -55,12 +54,11 @@
             </span>
             <span selectable="true" class="goods_num" v-if="(item.good_price)==null">暂时商品货号</span>
             <view class="goods_meg_bottom">
-              <view class="price">￥{{item.good_price}}元/米</view>
-              <view class="goShop">详情</view>
+              <view class="price">￥{{item.good_price}}元/起</view>
+              <view class="goDetail">详情</view>
             </view>
           </view>
         </view>
-        <view class="line"></view>
       </view>
     </view>
   </view>
@@ -90,7 +88,8 @@ export default {
   onPullDownRefresh() {
     let t = this;
     t.page = 1;
-
+    t.goodsList = [];
+    t.getIndexGoodsList();
     uni.stopPullDownRefresh();
   },
   /* 触底判断加载下一页 */
@@ -110,7 +109,6 @@ export default {
   onLoad() {
     let t = this;
     t.getIndexGoodsList();
-
     console.log(t.goodsList, "goodsListgoodsList");
   },
 
@@ -126,14 +124,15 @@ export default {
       let t = this,
         list = t.goodsList,
         page = t.page;
+      let data = {
+        page: page,
+        limit: 5
+      };
       // let data = {
-      //   page: page,
-      //   limit: 5
+      //   title: "景区"
       // };
-      t.$utils.ajax(t.$api.detail, "get", "", res => {
+      t.$utils.ajax(t.$api.detail, "get", data, res => {
         /* 数组拼接 */
-        console.log(res);
-
         list = list.concat(res);
         console.log(list, "首页商品列表");
         if (list.length == 0 && page == 1) {
@@ -154,12 +153,20 @@ export default {
         t.goodsList = list;
       });
     },
-    /* 获取轮播图 */
-    getBannerList() {
+    /* 查看景点详情 */
+    toDetail(good_id) {
+      console.log(good_id, "景点id");
+      setTimeout(() => {
+        uni.navigateTo({
+          url: "../index/detail?id=" + good_id
+        });
+      }, 150);
+    },
+    /* 前往搜索页面 */
+    toSearch() {
       let t = this;
-      t.$utils.ajax(t.$page.bannerList, "get", "", res => {
-        console.log(res, "轮播图");
-        t.bannerList = res;
+      uni.navigateTo({
+        url: "./search"
       });
     }
   }
@@ -170,6 +177,7 @@ export default {
 .content {
   width: 100%;
   min-height: 100vh;
+  background-color: var(--contentBgc);
   /* 搜索框 */
   .search {
     display: flex;
@@ -192,6 +200,7 @@ export default {
       background-color: #f5f5f9;
       clear: both;
     }
+    /*  */
     .allClass {
       margin: auto 0;
       margin-right: 30rpx;
@@ -205,6 +214,7 @@ export default {
       display: flex;
       flex-wrap: wrap;
       width: 100%;
+      padding-top: 20rpx;
       background-color: #fff;
       box-sizing: border-box;
       .nav {
@@ -225,25 +235,19 @@ export default {
         .navTitle {
           margin-top: 10rpx;
           text-align: center;
-          font-size: 24rpx;
-          font-weight: bolder;
+          color: #32312d;
+          font-size: 18rpx;
         }
       }
     }
     /* 推荐头部 */
     .list_head {
       margin-top: 20rpx;
-      /* margin-left: 20rpx; */
       width: 100%;
-      /* height: 100rpx; */
-      /* line-height: 100rpx; */
       text-align: center;
-      /* color: #dd3333; */
-      color: var(--themeColor);
-      font-size: 32upx;
+      color: #000;
+      font-family: " FangSong";
       font-weight: bolder;
-      /* background-color: #f3f3f3; */
-      /* font-weight: bolder; */
       box-sizing: border-box;
     }
     /* 推荐详情 */
@@ -258,7 +262,9 @@ export default {
         justify-content: space-between;
         /* margin-bottom: 20rpx; */
         background-color: #fff;
+
         .goods_image {
+          padding-top: 20rpx;
           width: 200rpx;
           height: 200rpx;
           image {
@@ -274,11 +280,12 @@ export default {
           margin-left: 15rpx;
           border-bottom: 4rpx solid red;
           border-bottom-color: var(--lineColor);
+
           .title {
             width: 400rpx;
             /* margin: 10rpx; */
             /* margin-top: 10rpx; */
-            font-size: var(--titleSize);
+            font-size: var(--scenicTitleSize);
             font-weight: bolder;
             height: 60rpx;
             line-height: 60rpx;
@@ -286,12 +293,12 @@ export default {
             white-space: nowrap;
             text-overflow: ellipsis;
             /* color: #dd3333; */
-            color: var(--themeColor);
+            color: #000;
             /*兼容性*/
             /* -webkit-text-overflow: ellipsis; */
           }
           .goods_num {
-            color: var(--nodeColor);
+            color: var(--detailColor);
             font-size: 22upx;
             /* width: 50rpx; */
             height: 50rpx;
@@ -304,6 +311,7 @@ export default {
             margin-top: 10rpx;
             justify-content: space-between;
             padding-bottom: 20rpx;
+
             .price {
               /* margin: 0 0 10rpx 10rpx; */
               color: var(--priceColor);
@@ -311,7 +319,7 @@ export default {
               font-size: var(--priceSize);
               font-weight: bolder;
             }
-            .goShop {
+            .goDetail {
               font-size: 32upx;
               /* font-weight: bolder; */
               color: #ffffff;

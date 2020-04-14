@@ -2,21 +2,6 @@
   <view class="content">
     <view class="title iconfont icon-lvyou1"></view>
     <view class="userCenter">
-      <!-- 用户名 -->
-      <!-- <view :class="isFoucs==2?'name inputFoucs':'name'">
-        <view class="nameIcon">
-          <view class="iconfont iconNameCard"></view>
-        </view>
-        <input
-          class="write"
-          type="text"
-          placeholder="请输入用户名"
-          v-model="userName"
-          @focus="isFoucs=2"
-          @blur="isFoucs=0"
-        />
-      </view>-->
-      <!-- 手机号 -->
       <view :class="isFoucs==1?'phone inputFoucs':'phone'">
         <view class="numberIcon">
           <view class="iconfont icon-shouji"></view>
@@ -62,7 +47,7 @@
         open-type="getUserInfo"
         @getuserinfo="getUserInfo"
         :class="isConfirmActive==1?'confirmActive animated bounceIn':'confirm'"
-        @tap="toLogin(userName,userPhone,userCode)"
+        @tap="toLogin(userPhone,userCode)"
         hover-start-time="5000"
       >登录</button>
     </view>
@@ -73,10 +58,12 @@
 export default {
   data() {
     return {
+      openid: "", //用户openId
       userPhone: "", //用户手机号
       userName: "", //用户名
       userCode: "", //验证码
       code: "", //登录code码
+      PhoneCode: "",
       ischecked: true, //是否显示授权按钮
       userRes: "", //授权后获取的用户信息
       time: 20, //验证码倒计时时间
@@ -112,22 +99,20 @@ export default {
     let t = this;
     let authSetting_userInfo = uni.getStorageSync("authSetting.userInfo");
     let userInfo = uni.getStorageSync("userInfo");
+    let sysInfo = { phone: "17853558905", wxNum: "huangmaorui102117" };
+    uni.setStorageSync("sysInfo", sysInfo);
+    
     console.log(authSetting_userInfo, "------");
     console.log(userInfo);
-    // if (authSetting_userInfo && userInfo) {
-    //   console.log('已经登录过');
-    // }
-    t.checkLogin();
   },
   onLoad() {
     let t = this;
-    // t.$utils.ajax(t.$api.detail, "get", "", res => {
-    //   console.log(res);
-    // });
+    // t.getCode();
+    // t.getUserChart();
   },
   methods: {
-    /* 获取登录code码 */
-    checkLogin() {
+    /* 获取code码并且检查是否注册进表 */
+    getCode() {
       let t = this;
       uni.login({
         provider: "weixin",
@@ -135,16 +120,67 @@ export default {
           console.log(res, "res");
           if (res.code) {
             t.code = res.code;
+            t.getUserChart();
           } else {
             console.log("登录失败", res.errMsg);
           }
         }
       });
     },
+    /* 获取用户表，检查是否存在、是否要向数据库插入数据 */
+    getUserChart() {
+      let t = this;
+      let data = {
+        appid: "wx4e740748bfb8fd79",
+        secret: "b40ac022a8da6d7f562ae5c93f1871d8",
+        js_code: t.code,
+        grant_type: "authorization_code"
+      };
+      t.$utils.ajax(
+        "https://api.weixin.qq.com/sns/jscode2session",
+        "get",
+        data,
+        res => {
+          console.log(res, "获取openid");
+          t.openid = res.openid;
+          let data = {
+            openid: res.openid
+          };
+          t.$utils.ajax(t.$api.userInfo, "get", data, res => {
+            console.log(res, "用户表信息");
+            if (res) {
+              console.log("用户已经存在");
+              t.$utils.showToast("验证通过", "/static/img/loginSuccess.png");
+              setTimeout(() => {
+                uni.hideToast();
+                uni.switchTab({
+                  url: "../index/index"
+                });
+              }, 1000);
+              return;
+            } else {
+              let data = {
+                openid: t.openid,
+                userName: userInfo.nickName,
+                userPhone: phone
+              };
+              t.$utils.ajax(t.$api.userInfo, "post", data, res => {
+                console.log(res);
+                uni.switchTab({
+                  url: "../index/index"
+                });
+              });
+              console.log(t.userRes);
+            }
+          });
+        }
+      );
+    },
     /* 授权登录 */
     getUserInfo(e) {
       let t = this,
         authSetting_userInfo = uni.getStorageSync("authSetting.userInfo");
+      console.log(e, "6666666666666666666");
       if (authSetting_userInfo == true) return;
       this.$utils.getSetting(() => {
         let t = this,
@@ -191,42 +227,6 @@ export default {
       }
     },
     /* 发送验证码 */
-    /* toSend() {
-      
-      let t = this,
-        authSetting_userInfo = uni.getStorageSync("authSetting.userInfo");
-      if (t.isCodeActive == 0 && authSetting_userInfo == true) {
-        t.$utils.showToast("号码格式错误", "/static/img/wrongPhone.png");
-        return;
-      }
-      if (
-        t.isCodeActive == 0 &&
-        (!authSetting_userInfo || authSetting_userInfo == false)
-      ) {
-        t.$utils.showToast("请先授权登录", "/static/img/toSetting.png");
-        return;
-      }
-
-      if (!t.timeStart) return; //防止重复点击
-      t.timeStart = false;
-      let block = setTimeout(() => {
-        t.isCodeActive = 0;
-      }, 500);
-      let clock = setInterval(() => {
-        t.time--;
-        t.content = t.time + "s后再试";
-        if (t.time < 0) {
-          //当倒计时小于0时清除定时器
-          clearInterval(clock);
-          clearTimeout(block);
-          t.content = "重发验证码";
-          t.time = 15;
-          t.timeStart = true;
-          t.getNumberLength(t.userPhone);
-          console.log(t.isCodeActive);
-        }
-      }, 500);
-    }, */
     toSend() {
       let t = this;
       if (t.isCodeActive == 0) {
@@ -240,9 +240,11 @@ export default {
       for (var i = 0; i < 6; i++) {
         var radom = Math.floor(Math.random() * 10);
         console.log(radom);
-        t.code += `${radom}`;
+        t.PhoneCode += radom;
       }
-      t.$utils.showToast("您的验证码:" + t.code);
+      console.log(t.PhoneCode, "PhoneCode");
+
+      t.$utils.showToast("您的验证码:" + t.PhoneCode);
       if (!t.timeStart) return; //防止重复点击
       t.timeStart = false;
       let block = setTimeout(() => {
@@ -258,7 +260,7 @@ export default {
           t.content = "重发验证码";
           t.time = 20;
           t.timeStart = true;
-          t.code = "";
+          t.PhoneCode = "";
           t.isCodeActive = 1;
           t.getNumberLength(t.userPhone);
           console.log(t.isCodeActive);
@@ -266,10 +268,13 @@ export default {
       }, 1000);
     },
     /* 验证登录 */
-    toLogin(name, phone, code) {
+    toLogin(phone, code) {
       let t = this,
         authSetting_userInfo = uni.getStorageSync("authSetting.userInfo"),
         userInfo = uni.getStorageSync("userInfo");
+      console.log(phone, "phonephonephone");
+      console.log(code, "codecodecode");
+
       console.log(userInfo);
       if (!authSetting_userInfo || authSetting_userInfo == false) {
         t.$utils.showToast("请先授权登录", "/static/img/toSetting.png");
@@ -279,29 +284,12 @@ export default {
         t.$utils.showToast("登录信息不全", "/static/img/megsLose.png");
         return;
       }
-      if (
-        // t.$utils.checkName(name) &&
-        t.$utils.checkPhone(phone) &&
-        t.$utils.checkCode(code)
-      ) {
-        let data = {
-          userName: userInfo.nickName,
-          userPhone: phone
-        };
-        t.$utils.ajax(t.$api.userInfo, "post", data, res => {
-          console.log(res);
-          uni.redirectTo({
-            url: "../index/index"
-          });
-        });
-        console.log(t.userRes);
-        t.$utils.showToast("验证通过", "/static/img/loginSuccess.png");
-        setTimeout(() => {
-          uni.hideToast();
-          uni.redirectTo({
-            url: "../index/index1"
-          });
-        }, 1000);
+      if (code != t.PhoneCode) {
+        t.$utils.showToast("验证码错误");
+        return;
+      }
+      if (t.$utils.checkPhone(phone) && t.$utils.checkCode(code)) {
+        t.getCode();
       }
     }
   }

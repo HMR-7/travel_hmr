@@ -26,7 +26,7 @@ page {
   --megColor: #54b5c9;
   --megsColor: #7f9ff3;
   --detailColor: #a2a2a2;
-  --priceColor: #dd3333;
+  --priceColor: #fc914c;
   --lineColor: #ededed;
   /* 未触发事件时的按钮背景色和字体颜色 */
   --remarksColor: #f7f7f7;
@@ -38,6 +38,7 @@ page {
   --navFontSize: 32rpx;
   --normalFontSize: 28rpx;
   --normalTitleSize: 24rpx;
+  --scenicTitleSize:28rpx;
   --stateBtnSize: 18rpx;
   --smallFontSize: 20rpx;
   --priceSize: 24upx;

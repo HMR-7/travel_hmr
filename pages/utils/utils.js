@@ -65,6 +65,7 @@ const utils = {
   },
   /* 一键复制 */
   setClipboardData(str) {
+    console.log(str,'strstr');
     uni.setClipboardData({
       data: str,
       success: function () {
@@ -167,10 +168,10 @@ const utils = {
     });
   }, */
   ajax: function (url, method, data, resolve) {
-    console.log(url, 'uel');
-    console.log(method, 'method');
-    console.log(data, 'data');
-    console.log(resolve, 'resolve');
+    // console.log(url, 'uel');
+    // console.log(method, 'method');
+    // console.log(data, 'data');
+    // console.log(resolve, 'resolve');
     if (!data) {
       data = {}
     }
@@ -182,6 +183,8 @@ const utils = {
         "custom-header": "application/x-www-form-urlencoded" //自定义请求头信息
       },
       success: (res) => {
+        console.log('请求数据打印---------');
+
         console.log(res.data);
         if (resolve) {
           resolve(res.data)
@@ -534,79 +537,7 @@ const utils = {
         nowDate
       }
     }
-  },
-  /* <view class="selDate">
-      <input type="number" v-model="Year" @input="getyear(Year,Month,nowDate)" maxlength="4" />年
-      <input type="number" v-model="Month" maxlength="2" @input="getmonth(Year,Month,nowDate)" />月
-      <input type="number" v-model="nowDate" maxlength="2" @input="getnowdate(Year,Month,nowDate)" />日
-    </view> */
-  /* Echats图 */
-  showColumn(e, canvasId, chartData) {
-    var chart = new uCharts({
-      $this: e,
-      canvasId: canvasId,
-      type: "area",
-      fontSize: 11,
-      legend: true,
-      dataLabel: false,
-      dataPointShape: true,
-      background: "#FFFFFF",
-      pixelRatio: e.pixelRatio,
-      categories: chartData.categories,
-      series: chartData.series,
-      animation: true,
-      enableScroll: true, //开启图表拖拽功能
-      xAxis: {
-        type: "grid",
-        gridType: "dash",
-        itemCount: 6, //x轴单屏显示数据的数量，默认为5个
-        scrollShow: true, //新增是否显示滚动条，默认false
-        scrollAlign: "left", //滚动条初始位置
-        scrollBackgroundColor: "#F7F7FF", //默认为 #EFEBEF
-        scrollColor: "#0ea391" //默认为 #A6A6A6
-      },
-      yAxis: {
-        title: '单位/伏特',
-        gridType: "dash",
-        gridColor: "#CCCCCC",
-        //   dashLength: 5,
-        splitNumber: 5,
-        format: val => {
-          return val.toFixed(0) + "V";
-        }
-        // min: 1,
-        // max: 30
-      },
-      width: e.cWidth * e.pixelRatio,
-      height: e.cHeight * e.pixelRatio,
-      /* 配置用户点击显示事件 */
-      extra: {
-        area: {
-          type: "straight",
-          opacity: 0.2,
-          addLine: true,
-          width: 2
-        },
-        tooltip: {
-          showBox: true, //是否显示半透明黑色的提示区域
-          bgColor: "#000000", //主体背景颜色
-          bgOpacity: 0.7, //背景颜色透明度
-          gridType: "dash", //辅助线类型（虚线）
-          dashLength: 5, //虚线单段长度
-          gridColor: "#1890ff", //辅助线颜色
-          fontColor: "#FFFFFF", //主体文字颜色
-          horizentalLine: true, //是否显示横向辅助线
-          xAxisLabel: true, //是否显示X轴辅助标签
-          yAxisLabel: true, //是否显示Y轴辅助标签
-          labelBgColor: "#DFE8FF", //标签背景颜色
-          labelBgOpacity: 0.95, //背景颜色透明度
-          labelFontColor: "#666666" //标签文字颜色
-        }
-      }
-    });
-    return chart
-  },
-
+  }
 }
 
 export default utils
