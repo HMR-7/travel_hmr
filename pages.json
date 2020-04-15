@@ -26,9 +26,26 @@
 			}
 		},
 		{
+			"path": "pages/page/index/searchRerult",
+			"style": {
+				"navigationBarBackgroundColor": "#000000",
+				"navigationBarTextStyle": "white",
+				"onReachBottomDistance": 50,
+				"usingComponents": {
+					"van-swipe-cell": "/wxcomponents/vant/dist/swipe-cell/index",
+					"van-uploader": "/wxcomponents/vant/dist/uploader/index",
+					"van-loading": "/wxcomponents/vant/dist/loading/index",
+					"van-popup": "/wxcomponents/vant/dist/popup/index",
+					"van-nav-bar": "/wxcomponents/vant/dist/nav-bar/index",
+					"van-icon": "/wxcomponents/vant/dist/icon/index"
+				},
+				"navigationBarTitleText": "搜索结果"
+			}
+		},
+		{
 			"path": "pages/page/index/detail",
 			"style": {
-				"navigationBarTitleText": "景点信息",
+				"navigationBarTitleText": "",
 				"navigationBarBackgroundColor": "#0ea391",
 				"navigationBarTextStyle": "white",
 				"enablePullDownRefresh": true,
@@ -47,6 +64,19 @@
 				"onReachBottomDistance": 50,
 				"usingComponents": {
 					"van-popup": "/wxcomponents/vant/dist/popup/index"
+				}
+			}
+		},
+		{
+			"path": "pages/page/index/travellog",
+			"style": {
+				"navigationBarTitleText": "日志发表",
+				"navigationBarBackgroundColor": "#0ea391",
+				"navigationBarTextStyle": "white",
+				"enablePullDownRefresh": true,
+				"onReachBottomDistance": 50,
+				"usingComponents": {
+					"van-uploader": "/wxcomponents/vant/dist/uploader/index"
 				}
 			}
 		},

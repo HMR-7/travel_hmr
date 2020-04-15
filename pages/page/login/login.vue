@@ -148,6 +148,7 @@ export default {
           };
           t.$utils.ajax(t.$api.userInfo, "get", data, res => {
             console.log(res, "用户表信息");
+            uni.setStorageSync('UserId', res.id)
             if (res) {
               console.log("用户已经存在");
               t.$utils.showToast("验证通过", "/static/img/loginSuccess.png");
@@ -211,11 +212,7 @@ export default {
         authSetting_userInfo = uni.getStorageSync("authSetting.userInfo");
       t.userPhone = phone;
       console.log(t.userPhone, "用户手机号");
-      if (
-        phone.length == 11 &&
-        authSetting_userInfo == true &&
-        t.timeStart == true
-      ) {
+      if (phone.length == 11 && t.timeStart == true) {
         t.isCodeActive = 1;
         console.log("11111111111");
 

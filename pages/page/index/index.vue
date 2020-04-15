@@ -39,7 +39,7 @@
           class="shop_details"
           v-for="(item,index) in goodsList"
           :key="index"
-          @click="toDetail(item.id)"
+          @click="toDetail(item.id,item.good_name)"
         >
           <view class="goods_image">
             <image :src="item.src" mode="modeFix" />
@@ -109,7 +109,7 @@ export default {
   onLoad() {
     let t = this;
     t.getIndexGoodsList();
-    console.log(t.goodsList, "goodsListgoodsList");
+    console.log(t.goodsList, "首页推荐列表");
   },
 
   methods: {
@@ -154,11 +154,11 @@ export default {
       });
     },
     /* 查看景点详情 */
-    toDetail(good_id) {
+    toDetail(good_id, good_name) {
       console.log(good_id, "景点id");
       setTimeout(() => {
         uni.navigateTo({
-          url: "../index/detail?id=" + good_id
+          url: "../index/detail?id=" + good_id + "&&name=" + good_name
         });
       }, 150);
     },

@@ -8,9 +8,20 @@
       ></i>
       <!-- <input class="toSee" type="text" placeholder="请输入关键字" /> -->
       <van-field
+        v-if="log==0"
         focus
         :value="value"
         placeholder="请输入关键字"
+        custom-style="margin-right:10rpx;width:560rpx;height:60rpx;background-color: #f5f5f9;padding:0;border-left:none;box-sizing:border-box;"
+        @input="getSearchKey"
+        @change="getThinkKey"
+        @blur="isThinkArea = false"
+      />
+      <van-field
+        v-if="log==1"
+        focus
+        :value="value"
+        placeholder="请输入景区名称后撰写文章"
         custom-style="margin-right:10rpx;width:560rpx;height:60rpx;background-color: #f5f5f9;padding:0;border-left:none;box-sizing:border-box;"
         @input="getSearchKey"
         @change="getThinkKey"
@@ -29,7 +40,7 @@
       </view>
     </view>
     <!-- 历史记录 -->
-    <view class="searchList" style="border-top:12rpx solid #f6f6f6">
+    <view v-if="log==0" class="searchList" style="border-top:12rpx solid #f6f6f6">
       <view class="searchListTitle">
         <span>搜索历史</span>
         <span
@@ -38,8 +49,24 @@
           @tap="clearHistory"
         ></span>
       </view>
-      <view class="list">
+      <view class="list" v-if="log==0">
         <view v-for="(item,index) in history" :key="index" @tap="handleHistoryItem(item)">{{item}}</view>
+      </view>
+    </view>
+    <!-- 商品列表 -->
+    <view v-if="log==1">666666</view>
+    <view class="list" v-if="log==1">
+      <view class="list_show">
+        <!-- 信息展示模块 -->
+        <view class="goods" v-for="(item,index) in goodsList" :key="index">
+          <view class="top">
+            <image :src="item.image" />
+          </view>
+          <view class="bottom">
+            <view class="title">{{item.title}}</view>
+            <view class="price">￥{{item.price}}/米</view>
+          </view>
+        </view>
       </view>
     </view>
   </view>
@@ -49,6 +76,7 @@
 export default {
   data() {
     return {
+      log: 0,
       timeId: -1, //输入框定时器
       isThinkArea: false, //联想区域是否显示
       searchKey: "", //点击确定的搜索关键词
@@ -59,20 +87,56 @@ export default {
       value: ""
     };
   },
-  onLoad() {
+  onLoad(options) {
     let t = this;
+    console.log(options);
+    if (options.log == undefined) {
+      t.log = 0;
+      console.log(111);
+    } else {
+      t.log = options.log;
+      console.log(222);
+    }
     t.history = uni.getStorageSync("history") || [];
   },
   onHide() {
     this.isThinkArea = false;
   },
   methods: {
+    /* 搜索点击事件 */
+    /* 搜素按钮 */
+    toStart(searchKey) {
+      let t = this;
+      if (t.log == 1) {
+        console.log("不用跳转页面");
+        let data = {
+          good_name: searchKey
+        };
+        t.$utils.ajax(t.$api.getSearchResult, "get", data, res => {
+          console.log(res);
+        });
+        return;
+      }
+      if (searchKey) {
+        uni.setStorageSync("searchKey", searchKey);
+        uni.navigateTo({
+          url: "./searchRerult?keyword=" + searchKey
+        });
+        return;
+      }
+    },
+    handleHistoryItem(item) {
+      let t = this;
+      console.log(item);
+      t.value = item;
+      t.searchKey = item;
+    },
     /* 获取输入框关键词 */
     getSearchKey(e) {
       this.searchKey = e.detail;
       console.log(e.detail);
     },
-    /* 获取联想词,显示在搜索页面山 */
+    /* 获取联想词,显示在搜索页面 */
     getThinkKey(e) {
       let t = this,
         length = t.thinkDetail.lenght;
@@ -85,7 +149,8 @@ export default {
       }
       t.timeId = setTimeout(() => {
         let data = {
-          keyword: e.detail
+          keyword: e.detail,
+          class: t.log
         };
         t.$utils.ajax(t.$api.getKeywords, "get", data, res => {
           console.log(res);
@@ -108,6 +173,9 @@ export default {
       let t = this;
       let _searchKey = t.searchKey;
       let isExist = false;
+      if (t.log == 1) {
+        return;
+      }
       if (!t.searchKey) {
         return;
       }
@@ -122,7 +190,17 @@ export default {
       !isExist && history.push(_searchKey);
       uni.setStorageSync("history", history);
       this.history = uni.getStorageSync("history") || [];
-      // console.log(this.history, "show");
+      for (var i = 0; i <= t._history.length; i++) {
+        if (t._history[i] === t.searchKey) {
+          isExist = true;
+          console.log(isExist, "有相同元素");
+          return;
+        }
+      }
+      let _history = uni.getStorageSync("_history") || [];
+      !isExist && _history.push(_searchKey);
+      uni.setStorageSync("_history", _history);
+      this._history = uni.getStorageSync("_history") || [];
     },
     /* 清除历史记录 */
     clearHistory() {
@@ -135,11 +213,7 @@ export default {
           if (res.confirm) {
             if (history.length <= 0) {
               t.$utils.showToast("您暂无搜索记录", "/static/img/noSearch.png");
-              //   uni.showToast({
-              //     title: "您暂无搜索记录",
-              //     image: "../../../static/img/noSearch.png",
-              //     duration: 2000
-              //   });
+
               return;
             } else {
               t.history = [];
@@ -233,6 +307,52 @@ export default {
     width: 620rpx;
     border: 2rpx solid #ededed;
     z-index: 10000;
+  }
+  /* 商品搜索列表 */
+  .list {
+    width: 100%;
+    // margin:20rpx 20rpx 0 20rpx;
+    margin-top: 20rpx;
+    background-color: var(--contentBgc);
+    height: 500rpx;
+    .list_show {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      .goods {
+        width: 44%;
+        height: 100%;
+        font-size: 28upx;
+        margin: 0 0% 4% 4%;
+        background-color: #fff;
+        /* border: 1rpx solid #ffffff; */
+        .top {
+          width: 100%;
+          height: 300rpx;
+          height: calc(100vh / 5);
+        }
+        .bottom {
+          display: flex;
+          flex-direction: column;
+          height: 130rpx;
+          .title {
+            width: 95%;
+            margin: 10rpx;
+            overflow: hidden;
+            white-space: pre-wrap;
+            text-overflow: ellipsis;
+            font-size: var(--scenicTitleSize);
+            font-weight: bolder;
+            .price {
+              margin-left: 10rpx;
+              color: var(--priceColor);
+              font-size: var(--normalTitleSize);
+              font-weight: bolder;
+            }
+          }
+        }
+      }
+    }
   }
 }
 </style>

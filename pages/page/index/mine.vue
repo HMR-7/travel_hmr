@@ -44,9 +44,9 @@
           <view class="caption">微信客服</view>
         </button>
       </view>
-      <view class="service_line" @tap="toSuggest">
+      <view class="service_line" @tap="toTravellog">
         <view class="iconfont icon-yijianfankui"></view>
-        <view class="caption">意见反馈</view>
+        <view class="caption">旅游日志</view>
       </view>
     </view>
     <!-- 电话客服 -->
@@ -100,6 +100,11 @@ export default {
     Copy(str) {
       let t = this;
       t.$utils.setClipboardData(str);
+    },
+    toTravellog() {
+      uni.navigateTo({
+        url: "./search?log=1"
+      });
     }
   }
 };
