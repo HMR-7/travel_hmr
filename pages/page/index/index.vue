@@ -293,8 +293,6 @@ export default {
 
           .title {
             width: 400rpx;
-            /* margin: 10rpx; */
-            /* margin-top: 10rpx; */
             font-size: var(--scenicTitleSize);
             font-weight: bolder;
             height: 60rpx;
@@ -302,7 +300,6 @@ export default {
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
-            /* color: #dd3333; */
             color: #000;
             /*兼容性*/
             /* -webkit-text-overflow: ellipsis; */
@@ -310,7 +307,6 @@ export default {
           .goods_num {
             color: var(--detailColor);
             font-size: 22upx;
-            /* width: 50rpx; */
             height: 50rpx;
             line-height: 50rpx;
             margin-top: 10rpx;
@@ -323,7 +319,6 @@ export default {
             padding-bottom: 20rpx;
 
             .price {
-              /* margin: 0 0 10rpx 10rpx; */
               color: var(--priceColor);
               /* color: gray; */
               font-size: var(--priceSize);

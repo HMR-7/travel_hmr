@@ -274,8 +274,6 @@ export default {
   position: relative;
   width: 100%;
   min-height: 100vh;
-  background-color: var(--contentBgc);
-
   box-sizing: border-box;
   /* 搜索区域 */
   .search {
@@ -305,12 +303,12 @@ export default {
     flex-direction: column;
     background-color: #ffffff;
     box-sizing: border-box;
+
     /* 联想区域 */
 
     .searchListTitle {
       margin: 10rpx 0 10rpx 20rpx;
       color: #969799;
-      font-size: var(--smallFontSize);
       //   font-weight: bolder;
     }
     .list {
