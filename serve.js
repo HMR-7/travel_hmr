@@ -188,7 +188,7 @@ app.get("/getSwiper", function (req, res) {
     })
 });
 
-/* 获取用户上传日志、照片 */
+/* 获取用户上传日志 */
 app.post("/submitFeedback", function (req, res) {
     var data = "";
     req.on('data', function (chunk) {
@@ -202,12 +202,12 @@ app.post("/submitFeedback", function (req, res) {
             if (err) {
                 console.log(err);
                 res.send({
-                    msg: "注册失败!!",
+                    msg: "发布失败!!",
                     flag: 'no'
                 });
             } else {
                 res.send({
-                    msg: "提交成功",
+                    msg: "发布成功",
                     flag: 'yes'
                 });
             }
@@ -221,12 +221,17 @@ app.post("/submitFeedback", function (req, res) {
 app.get("/getSearchResult", function (req, res) {
     let Sqldata = req.query;
     console.log(Sqldata, 'get获取的前端参数');
-    
-    const sql = "select * from detail where good_name ='" + Sqldata.good_name + "'"
+    const sql = "select * from detail where good_name like '%" + Sqldata.good_name + "%'"
     conn.query(sql, function (err, result) {
         let _res = JSON.stringify(result)
         let data = JSON.parse(_res)
-        res.send(data);
+        data.forEach((v, i, arr) => {
+            arr[i].swipeArr = arr[i].swipeArr.split(",");
+        });
+        console.log(data, 'data');
+        res.send(
+            data
+        );
     })
 })
 app.listen(3000, () => {

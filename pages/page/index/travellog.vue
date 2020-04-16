@@ -1,7 +1,6 @@
 <template>
   <view class="content">
-    <textarea class="sugs" placeholder="请输入内容" maxlength="-1"  @input="onInput"></textarea>
-
+    <textarea class="sugs" placeholder="请输入内容" maxlength="-1" @input="onInput"></textarea>
     <view class="sumbit" @tap="confirm">提交</view>
   </view>
 </template>
@@ -17,11 +16,17 @@ export default {
   },
   onLoad() {
     let t = this,
-      us = uni.getStorageSync("UserId");
+      us = uni.getStorageSync("UserId"),
+      userInfo = uni.getStorageSync("userInfo");
     // 检查是否完成登录
+    userInfo.id = us;
     t.$utils.checkLogin();
     t.userid = us;
-    console.log(t.userid, "缓存用户信息");
+    t.userInfo = userInfo;
+    console.log(userInfo);
+
+    console.log(t.userid, "用户id");
+    console.log(t.userInfo, "用户信息");
   },
   methods: {
     onInput(e) {
@@ -33,7 +38,6 @@ export default {
       let t = this,
         userid = t.userid,
         article = t.suggests;
-
       if (article == null) {
         t.$utils.showToast("请确认您是否已输入内容");
         return;
@@ -41,7 +45,7 @@ export default {
       console.log(userid, "useriduseriduserid");
       let userInfo = uni.getStorageSync("userInfo");
       let data = {
-        user_id: userid,
+        user_id: userInfo.id,
         user_head: userInfo.avatarUrl,
         user_name: userInfo.nickName,
         article: article
@@ -69,9 +73,10 @@ export default {
   background-color: var(--contentBgc);
   box-sizing: border-box;
   .sugs {
+    margin-bottom: 40rpx;
     width: 100%;
     background-color: #fff;
-    border-bottom: 3rpx solid #f6f6f6;
+    border-bottom: 3rpx solid #a2a2a2;
   }
   .imgUp {
     margin: 0 auto;

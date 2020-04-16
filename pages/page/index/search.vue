@@ -54,17 +54,36 @@
       </view>
     </view>
     <!-- 商品列表 -->
-    <view v-if="log==1">666666</view>
-    <view class="list" v-if="log==1">
-      <view class="list_show">
+    <view class="list_log" v-if="log==1">
+      <view class="list_show" v-for="(item,index) in result_log" :key="index">
         <!-- 信息展示模块 -->
-        <view class="goods" v-for="(item,index) in goodsList" :key="index">
+        <view class="goods">
           <view class="top">
-            <image :src="item.image" />
-          </view>
-          <view class="bottom">
-            <view class="title">{{item.title}}</view>
-            <view class="price">￥{{item.price}}/米</view>
+            <swiper
+              class="img-container"
+              indicator-dots="true"
+              indicator-color="var(--detailColor)"
+              indicator-active-color="var(--themeColor)"
+              circular
+              autoplay
+            >
+              <block v-for="(item1, index1) in item.swipeArr" :key="index1">
+                <swiper-item class="item">
+                  <!-- <view class="swiper_title">{{item.title}}</view> -->
+                  <image
+                    class="itemImg"
+                    :class="{active:currentIndex==index}"
+                    :src="item1"
+                    @tap="previewImage(item)"
+                  />
+                </swiper-item>
+              </block>
+            </swiper>
+            <view class="bottom">
+              <view class="title">{{item.good_name}}</view>
+              <view class="price">{{item.introduce}}</view>
+              <view class="price" style="margin-top:10rpx;color:#a2a2a2">地址：{{item.address}}</view>
+            </view>
           </view>
         </view>
       </view>
@@ -77,6 +96,7 @@ export default {
   data() {
     return {
       log: 0,
+      result_log: "", //用户写文章时候的搜索结果
       timeId: -1, //输入框定时器
       isThinkArea: false, //联想区域是否显示
       searchKey: "", //点击确定的搜索关键词
@@ -107,23 +127,34 @@ export default {
     /* 搜素按钮 */
     toStart(searchKey) {
       let t = this;
+      console.log(typeof searchKey);
+
+      console.log(t.timeId, "timeId");
+
       if (t.log == 1) {
         console.log("不用跳转页面");
+        if (searchKey == "") {
+          t.$utils.showToast("请输入景点名");
+          return;
+        }
         let data = {
           good_name: searchKey
         };
+        console.log(data);
         t.$utils.ajax(t.$api.getSearchResult, "get", data, res => {
-          console.log(res);
+          console.log(res, "用户写文章时候的搜索结果");
+          t.result_log = res;
+
+          console.log(t.result_log, "t.result_log");
         });
-        return;
       }
-      if (searchKey) {
+      /* if (searchKey) {
         uni.setStorageSync("searchKey", searchKey);
         uni.navigateTo({
           url: "./searchRerult?keyword=" + searchKey
         });
         return;
-      }
+      } */
     },
     handleHistoryItem(item) {
       let t = this;
@@ -243,13 +274,15 @@ export default {
   position: relative;
   width: 100%;
   min-height: 100vh;
-  /* background-color: #f8f8f8; */
+  background-color: var(--contentBgc);
+
   box-sizing: border-box;
   /* 搜索区域 */
   .search {
     display: flex;
     flex-direction: row;
     padding: 20rpx 0 20rpx 20rpx;
+    background-color: #fff;
     /* 搜索输入框 */
     .van-field__input {
       height: 60rpx !important;
@@ -309,27 +342,47 @@ export default {
     z-index: 10000;
   }
   /* 商品搜索列表 */
-  .list {
-    width: 100%;
-    // margin:20rpx 20rpx 0 20rpx;
+  .list_log {
+    // width: 100%;
+    margin: 20rpx 20rpx 0 20rpx;
     margin-top: 20rpx;
-    background-color: var(--contentBgc);
     height: 500rpx;
     .list_show {
+      margin-top: 20rpx;
+      padding: 20rpx;
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
+      border-radius: 20rpx;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+
       .goods {
-        width: 44%;
+        width: 100%;
         height: 100%;
         font-size: 28upx;
-        margin: 0 0% 4% 4%;
-        background-color: #fff;
-        /* border: 1rpx solid #ffffff; */
+
         .top {
           width: 100%;
-          height: 300rpx;
-          height: calc(100vh / 5);
+          border-radius: 15rpx;
+          overflow: hidden;
+          transform: translateY(0);
+          /* 轮播图 */
+          .img-container {
+            overflow: hidden;
+            transform: translateY(0);
+            height: 400rpx;
+            width: 100%;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            .item {
+              height: 100%;
+              .itemImg {
+                width: 100%;
+                height: 100%;
+              }
+            }
+          }
         }
         .bottom {
           display: flex;
@@ -343,12 +396,12 @@ export default {
             text-overflow: ellipsis;
             font-size: var(--scenicTitleSize);
             font-weight: bolder;
-            .price {
-              margin-left: 10rpx;
-              color: var(--priceColor);
-              font-size: var(--normalTitleSize);
-              font-weight: bolder;
-            }
+          }
+          .price {
+            margin-left: 10rpx;
+            color: var(--priceColor);
+            font-size: var(--normalTitleSize);
+            font-weight: bolder;
           }
         }
       }
