@@ -1,5 +1,4 @@
 <script>
-import uCharts from "./static/u-charts/u-charts";
 export default {
   onLaunch: function() {
     let t = this;
