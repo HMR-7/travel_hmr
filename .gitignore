@@ -3,3 +3,4 @@ node_modules
 /pages/siteinfo
 /unpackage
 unpackage
+/serve.js

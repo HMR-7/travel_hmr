@@ -9,19 +9,23 @@
 export default {
   data() {
     return {
+      good_id:'',//
       userInfo: "",
       suggests: null,
       userid: null
     };
   },
-  onLoad() {
+  onLoad(options) {
     let t = this,
       us = uni.getStorageSync("UserId"),
       userInfo = uni.getStorageSync("userInfo");
+      console.log(options);
+      
     // 检查是否完成登录
     userInfo.id = us;
     t.$utils.checkLogin();
     t.userid = us;
+    t.good_id = options.id;
     t.userInfo = userInfo;
     console.log(userInfo);
 
@@ -45,6 +49,7 @@ export default {
       console.log(userid, "useriduseriduserid");
       let userInfo = uni.getStorageSync("userInfo");
       let data = {
+        good_id: t.good_id,
         user_id: userInfo.id,
         user_head: userInfo.avatarUrl,
         user_name: userInfo.nickName,
