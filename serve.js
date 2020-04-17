@@ -258,7 +258,7 @@ app.get("/getScenicwords", function (req, res) {
     conn.query(sql, function (err, result) {
         let _res = JSON.stringify(result)
         let data = JSON.parse(_res)
-        a = [...data];
+        a = [...data]; 
         console.log(a, 'resultresult1');
     })
 
