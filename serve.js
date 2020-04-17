@@ -168,6 +168,7 @@ app.get("/getSwiper", function (req, res) {
     conn.query(sql, function (err, result) {
         let _res = JSON.stringify(result)
         let data = JSON.parse(_res)
+
         let swiperArr = data[0].swipeArr.split(",");
         let tags = data[0].tags.split(",");
         data[0].swipeArr = swiperArr;
@@ -186,6 +187,17 @@ app.get("/getSwiper", function (req, res) {
         conn.query(sqlcollect, function (err, result) {
             let _res = JSON.stringify(result)
             let data = JSON.parse(_res)
+
+            console.log(data, '未收藏的用户返回值');
+            console.log(data.length, 'length');
+            console.log(data instanceof Array);
+
+            if (data.length == 0) {
+                console.log('你跑不跑');
+                data = [{
+                    iscollect: 0
+                }];
+            }
             theRes = [...theRes, ...data]
             console.log(theRes, 'theRes222222');
             res.send(theRes)
@@ -262,38 +274,16 @@ app.post("/userCollect", function (req, res) {
         data = JSON.parse(data)
         console.log(data, 'post请求接受前端传递的参数');
         // let data = JSON.parse(_res)
-        const sqlcollect = "SELECT iscollect from collect WHERE id='" + data.user_id + "'  AND good_id=" + data.good_id
+        const sqlcollect = "SELECT iscollect from collect WHERE user_id='" + data.user_id + "'  AND good_id=" + data.good_id
         conn.query(sqlcollect, function (err, result) {
             console.log(result, '------');
             let _res = JSON.stringify(result)
             let _data = JSON.parse(_res)
-            let [{
-                iscollect
-            }] = _data;
-            console.log({
-                iscollect
-            }, '111111111111');
-            console.log(iscollect, '22222222222222');
-            if (iscollect == 0) {
-                const sql = "UPDATE collect SET iscollect = '1' WHERE user_id=" + data.user_id + " AND good_id=" + data.good_id
-                conn.query(sql, function (err, result) {
-                    if (err) {
-                        console.log(err);
-                        res.send({
-                            msg: "操作失败!!",
-                            flag: 'no'
-                        });
-                    } else {
-                        res.send({
-                            msg: "操作成功!!",
-                            flag: 'yes'
-                        });
-                    }
-                })
-            } else if (iscollect == 1) {
 
-                const sql = "UPDATE collect SET iscollect = '0' WHERE user_id=" + data.user_id + " AND good_id=" + data.good_id
-                conn.query(sql, function (err, result) {
+            if (_data.length == 0) {
+
+                const sqlinsert = "insert into  collect (user_id,good_id,iscollect) values (" + data.user_id + "," + data.good_id + ",1)"
+                conn.query(sqlinsert, function (err, result) {
                     if (err) {
                         console.log(err);
                         res.send({
@@ -307,7 +297,50 @@ app.post("/userCollect", function (req, res) {
                         });
                     }
                 })
+            } else {
+                let [{
+                    iscollect
+                }] = _data;
+                console.log({
+                    iscollect
+                }, '111111111111');
+                console.log(iscollect, '22222222222222');
+                if (iscollect == 0) {
+                    const sql = "UPDATE collect SET iscollect = '1' WHERE user_id=" + data.user_id + " AND good_id=" + data.good_id
+                    conn.query(sql, function (err, result) {
+                        if (err) {
+                            console.log(err);
+                            res.send({
+                                msg: "操作失败!!",
+                                flag: 'no'
+                            });
+                        } else {
+                            res.send({
+                                msg: "操作成功!!",
+                                flag: 'yes'
+                            });
+                        }
+                    })
+                } else if (iscollect == 1) {
+
+                    const sql = "UPDATE collect SET iscollect = '0' WHERE user_id=" + data.user_id + " AND good_id=" + data.good_id
+                    conn.query(sql, function (err, result) {
+                        if (err) {
+                            console.log(err);
+                            res.send({
+                                msg: "操作失败!!",
+                                flag: 'no'
+                            });
+                        } else {
+                            res.send({
+                                msg: "操作成功!!",
+                                flag: 'yes'
+                            });
+                        }
+                    })
+                }
             }
+
         })
 
 
