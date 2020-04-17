@@ -155,25 +155,16 @@ app.get("/getKeywords", function (req, res) {
 
 
 });
-/* 写日志时，获取景区联想词 */
-app.get("/getScenicwords", function (req, res) {
-    let reData = req.query;
-    const sql = "SELECT good_name FROM detail where good_name like '%" + reData.keyword + "%' "
-    conn.query(sql, function (err, result) {
-        let _res = JSON.stringify(result)
-        let data = JSON.parse(_res)
-        a = [...data];
-        console.log(a, 'resultresult1');
-    })
 
-
-});
-/* 详情页获取轮播图数据 */
+/* 根据商品id获取商品详情 */
 app.get("/getSwiper", function (req, res) {
     let Sqldata = req.query;
     console.log(Sqldata, 'get获取的前端参数');
     // const sql = "SELECT swipeArr FROM detail where id =" + req.query.good_id + ""
     const sql = "select * from detail where id =" + req.query.good_id + ""
+    const sqlcollect = "SELECT iscollect from collect WHERE id=" + req.query.user_id + "  AND good_id=" + req.query.good_id
+    console.log(sqlcollect, 'sqlcollectsqlcollectsqlcollect');
+    var theRes = ""
     conn.query(sql, function (err, result) {
         let _res = JSON.stringify(result)
         let data = JSON.parse(_res)
@@ -181,11 +172,25 @@ app.get("/getSwiper", function (req, res) {
         let tags = data[0].tags.split(",");
         data[0].swipeArr = swiperArr;
         data[0].tags = tags;
-
-        // console.log(swiperArr, 'swiperArrswiperArrswiperArr');
-        res.send(data[0]);
-        console.log(data[0], 'resultresult');
+        if (!Sqldata.user_id) {
+            theRes = [data[0]]
+            console.log(theRes, 'theRes1111111');
+            res.send(theRes)
+            return
+        } else if (Sqldata.user_id) {
+            theRes = [data[0]]
+        }
+        // console.log(data[0], 'resultresult');
     })
+    if (Sqldata.user_id) {
+        conn.query(sqlcollect, function (err, result) {
+            let _res = JSON.stringify(result)
+            let data = JSON.parse(_res)
+            theRes = [...theRes, ...data]
+            console.log(theRes, 'theRes222222');
+            res.send(theRes)
+        })
+    }
 });
 
 /* 获取用户上传日志 */
@@ -197,8 +202,8 @@ app.post("/submitFeedback", function (req, res) {
     req.on('end', function () {
         data = JSON.parse(data)
         console.log(data, 'post请求接受前端传递的参数');
-        const insertsql = 'insert into travellog(user_id,user_head,user_name,article) values(?,?,?,?)';
-        conn.query(insertsql, [data.user_id, data.user_head, data.user_name, data.article], function (err) {
+        const insertsql = 'insert into travellog(good_id,user_id,user_head,user_name,article) values(?,?,?,?,?)';
+        conn.query(insertsql, [data.good_id, data.user_id, data.user_head, data.user_name, data.article], function (err) {
             if (err) {
                 console.log(err);
                 res.send({
@@ -217,7 +222,7 @@ app.post("/submitFeedback", function (req, res) {
 
 })
 
-/* 根据关键词查询 */
+/* 写日志时，搜索按钮的点击事件查询 */
 app.get("/getSearchResult", function (req, res) {
     let Sqldata = req.query;
     console.log(Sqldata, 'get获取的前端参数');
@@ -232,6 +237,80 @@ app.get("/getSearchResult", function (req, res) {
         res.send(
             data
         );
+    })
+})
+/* 写日志时，获取景区联想词 */
+app.get("/getScenicwords", function (req, res) {
+    let reData = req.query;
+    const sql = "SELECT good_name FROM detail where good_name like '%" + reData.keyword + "%' "
+    conn.query(sql, function (err, result) {
+        let _res = JSON.stringify(result)
+        let data = JSON.parse(_res)
+        a = [...data];
+        console.log(a, 'resultresult1');
+    })
+
+
+});
+/* 用户收藏表 */
+app.post("/userCollect", function (req, res) {
+    var data = "";
+    req.on('data', function (chunk) {
+        data += chunk;
+    })
+    req.on('end', function () {
+        data = JSON.parse(data)
+        console.log(data, 'post请求接受前端传递的参数');
+        // let data = JSON.parse(_res)
+        const sqlcollect = "SELECT iscollect from collect WHERE id='" + data.user_id + "'  AND good_id=" + data.good_id
+        conn.query(sqlcollect, function (err, result) {
+            console.log(result, '------');
+            let _res = JSON.stringify(result)
+            let _data = JSON.parse(_res)
+            let [{
+                iscollect
+            }] = _data;
+            console.log({
+                iscollect
+            }, '111111111111');
+            console.log(iscollect, '22222222222222');
+            if (iscollect == 0) {
+                const sql = "UPDATE collect SET iscollect = '1' WHERE user_id=" + data.user_id + " AND good_id=" + data.good_id
+                conn.query(sql, function (err, result) {
+                    if (err) {
+                        console.log(err);
+                        res.send({
+                            msg: "操作失败!!",
+                            flag: 'no'
+                        });
+                    } else {
+                        res.send({
+                            msg: "操作成功!!",
+                            flag: 'yes'
+                        });
+                    }
+                })
+            } else if (iscollect == 1) {
+
+                const sql = "UPDATE collect SET iscollect = '0' WHERE user_id=" + data.user_id + " AND good_id=" + data.good_id
+                conn.query(sql, function (err, result) {
+                    if (err) {
+                        console.log(err);
+                        res.send({
+                            msg: "操作失败!!",
+                            flag: 'no'
+                        });
+                    } else {
+                        res.send({
+                            msg: "操作成功!!",
+                            flag: 'yes'
+                        });
+                    }
+                })
+            }
+        })
+
+
     })
 })
 app.listen(3000, () => {
