@@ -19,12 +19,20 @@ var conn = mysql.createConnection({
     database: "travel"
 }); */
 //连接数据库
+// var conn = mysql.createConnection({
+//     host: "192.168.88.121",
+//     port: "3306",
+//     user: "root",
+//     password: "123456",
+//     database: "travel"
+// });
+//连接个人服务器数据库
 var conn = mysql.createConnection({
-    host: "192.168.88.121",
+    host: "120.55.93.29",
     port: "3306",
-    user: "root",
-    password: "123456",
-    database: "travel"
+    user: "hmr",
+    password: "101216",
+    database: "hmr"
 });
 //2.发送请求(查询)
 /* 查询用户是否已经注册完毕， */
@@ -108,7 +116,6 @@ app.get("/getKeywords", function (req, res) {
     var a = [];
     console.log(reData, '前端参数');
     console.log(reData.class == 0);
-
     const sql = "SELECT good_name FROM detail where good_name like '%" + reData.keyword + "%' "
     const sql1 = "SELECT food_name as good_name FROM food where food_name like '%" + reData.keyword + "%' "
     const sql2 = "SELECT hotel_name as good_name FROM hotel where hotel_name like '%" + reData.keyword + "%' "
