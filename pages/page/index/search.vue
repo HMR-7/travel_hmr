@@ -55,7 +55,12 @@
     </view>
     <!-- 商品列表 -->
     <view class="list_log" v-if="log==1">
-      <view class="list_show" v-for="(item,index) in result_log" :key="index">
+      <view
+        class="list_show"
+        v-for="(item,index) in result_log"
+        :key="index"
+        @tap="toDetail(item.id,item.good_name)"
+      >
         <!-- 信息展示模块 -->
         <view class="goods">
           <view class="top">
@@ -70,12 +75,7 @@
               <block v-for="(item1, index1) in item.swipeArr" :key="index1">
                 <swiper-item class="item">
                   <!-- <view class="swiper_title">{{item.title}}</view> -->
-                  <image
-                    class="itemImg"
-                    :class="{active:currentIndex==index}"
-                    :src="item1"
-                    @tap="previewImage(item)"
-                  />
+                  <image class="itemImg" :class="{active:currentIndex==index}" :src="item1" />
                 </swiper-item>
               </block>
             </swiper>
@@ -112,7 +112,6 @@ export default {
     console.log(options);
     if (options.log == undefined) {
       t.log = 0;
-      console.log(111);
     } else {
       t.log = options.log;
       console.log(222);
@@ -147,6 +146,17 @@ export default {
 
           console.log(t.result_log, "t.result_log");
         });
+      } else if (t.log == 0) {
+        if (searchKey == "") {
+          t.$utils.showToast("请输入景点名");
+          return;
+        } else {
+          console.log(searchKey,'searchKey');
+          
+          uni.navigateTo({
+            url: "./searchRerult?keyword=" + searchKey
+          });
+        }
       }
       /* if (searchKey) {
         uni.setStorageSync("searchKey", searchKey);
@@ -156,6 +166,7 @@ export default {
         return;
       } */
     },
+    /* 选择联想区域对输入框赋值 */
     handleHistoryItem(item) {
       let t = this;
       console.log(item);
@@ -221,17 +232,7 @@ export default {
       !isExist && history.push(_searchKey);
       uni.setStorageSync("history", history);
       this.history = uni.getStorageSync("history") || [];
-      for (var i = 0; i <= t._history.length; i++) {
-        if (t._history[i] === t.searchKey) {
-          isExist = true;
-          console.log(isExist, "有相同元素");
-          return;
-        }
-      }
-      let _history = uni.getStorageSync("_history") || [];
-      !isExist && _history.push(_searchKey);
-      uni.setStorageSync("_history", _history);
-      this._history = uni.getStorageSync("_history") || [];
+      
     },
     /* 清除历史记录 */
     clearHistory() {
@@ -264,6 +265,13 @@ export default {
       t.value = item;
       t.searchKey = item;
       t.isThinkArea = false;
+    },
+    /* 用户写日志时前往对商品详情表 */
+    toDetail(good_id,good_name) {
+      let t = this;
+      uni.navigateTo({
+        url: "./detail?log=" + t.log + "&&id=" + good_id +"&&good_name=" +good_name
+      });
     }
   }
 };

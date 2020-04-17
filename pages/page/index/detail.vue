@@ -32,7 +32,7 @@
         </view>
         <!-- 商品收藏 -->
         <view
-          :class="isCollect ==1?' icon-guanzhu1 icon_select-color':'icon-guanzhu2'"
+          :class="isCollect ==1?' icon-guanzhu1 icon_select_color':'icon-guanzhu2'"
           class="iconfont"
           style="font-size:40rpx;"
           @tap="handleCollect"
@@ -56,7 +56,11 @@
         color: #7a7e83;
         "
         >所在地：{{goodDetail.address}}</view>
-        <view class="place mar_bottom" v-if="isCost!==0">门票价：{{goodDetail.good_price}}元/起</view>
+        <view
+          class="place mar_bottom"
+          v-if="isCost!==0"
+          style="color:var(--priceColor)"
+        >门票价：{{goodDetail.good_price}}元/起</view>
         <!-- <view>销量0米</view>
         <view>剩余库存：10000米</view>-->
       </view>
@@ -84,6 +88,18 @@
       <!-- 详情咨询提示 -->
       <view class="selMorePrice">详情可到景区售票处询问</view>
     </view>
+    <!-- 用户日志发布区域 -->
+    <view class="travellog" v-if="log==1">
+      <view class="title">旅游日志</view>
+      <textarea
+        class="sugs"
+        placeholder-style="padding-left:20rpx"
+        placeholder="请输入内容"
+        maxlength="-1"
+        @input="onInput"
+      ></textarea>
+      <view class="sumbit" @tap="confirm">提交</view>
+    </view>
   </view>
 </template>
 
@@ -91,29 +107,135 @@
 export default {
   data() {
     return {
-      good_name: "", //景点名称
+      isCollect: "", //是否被用户收藏
+      log: 0, //判断是否是日志发布
+      user_id: "", //用户id
       good_id: "", //景点id
+      good_name: "", //景点名称
       goodDetail: "", //商品详情
       imgArr: "", //轮播图
-      isCollect: "" //是否收藏
+      isCollect: "", //是否收藏
+      suggests: null //用户日志到发表内容
     };
   },
-  created() {},
+  created() {
+    let t = this;
+    t.user_id = uni.getStorageSync("UserId");
+  },
   onLoad(options) {
     let t = this;
     console.log(options);
-    t.$utils.setAppTitile(options.name);
-    t.good_name = options.name;
-    let data = {
-      good_id: options.id
-    };
-    t.$utils.ajax(t.$api.getSwiper, "get", data, res => {
-      console.log(res);
-      t.goodDetail = res;
-      t.imgArr = res.swipeArr;
-    });
+    if (!options.log) {
+    } else if (options.log == 1) {
+      t.log = options.log;
+      t.$utils.setAppTitile(options.good_name);
+    }
+    if (options.log == 0) {
+      t.$utils.setAppTitile(options.name);
+    } else {
+      t.$utils.setAppTitile(options.name);
+    }
+    // t.good_name = options.name;
+    t.good_id = options.id;
+    t.getGoodDetail();
   },
-  methods: {}
+  methods: {
+    /* 获取商品详情 */
+    getGoodDetail() {
+      let t = this;
+      let data = {
+        user_id: t.user_id,
+        good_id: t.good_id
+      };
+      t.$utils.ajax(t.$api.getSwiper, "get", data, res => {
+        console.log(res);
+        t.goodDetail = res[0];
+        t.imgArr = res[0].swipeArr;
+        t.isCollect = res[1].iscollect;
+      });
+    },
+    /* 用户点击收藏 */
+    handleCollect() {
+      let t = this,
+        good_id = t.good_id,
+        user_id = t.user_id;
+      console.log(good_id, "good_id");
+      console.log(user_id, "user_id");
+
+      if (!user_id) {
+        t.$utils.checkLogin();
+        return;
+      }
+      let data = {
+        good_id: good_id,
+        user_id: user_id
+      };
+      if (!user_id) {
+        t.$utils.checkLogin();
+        return;
+      }
+      t.$utils.ajax(t.$api.userCollect, "post", data, res => {
+        console.log(res);
+        if (res.flag == "yes") {
+          t.isCollect = !t.isCollect;
+        }
+        if(t.isCollect){
+          setTimeout(() => {
+            t.$utils.showToast('收藏成功');
+          }, 300);
+        } else if(!t.isCollect){
+          setTimeout(() => {
+            t.$utils.showToast('已取消收藏');
+          }, 300);
+        }
+      });
+    },
+    /* 轮播图点击预览 */
+    previewImage(item) {
+      let t = this,
+        imgSrc = t.imgArr;
+      uni.previewImage({
+        urls: imgSrc
+      });
+    },
+    /* 用户对日志内容 */
+    onInput(e) {
+      let t = this,
+        user_id = t.userid;
+      t.suggests = e.detail.value;
+    },
+    /* 日志提交点击事件 */
+    confirm() {
+      let t = this,
+        user_id = t.user_id,
+        good_id = t.goodDetail.id,
+        article = t.suggests;
+      if (article == null) {
+        t.$utils.showToast("请确认您是否已输入内容");
+        return;
+      }
+      console.log(user_id, "useriduseriduserid");
+      let userInfo = uni.getStorageSync("userInfo");
+      let data = {
+        good_id: good_id,
+        user_id: user_id,
+        user_head: userInfo.avatarUrl,
+        user_name: userInfo.nickName,
+        article: article
+      };
+      t.$utils.ajax(t.$page.submitFeedback, "post", data, res => {
+        console.log(res);
+        t.$utils.showToast("发布成功，即将跳转到首页");
+        setTimeout(() => {
+          console.log(1111);
+
+          uni.switchTab({
+            url: "./index"
+          });
+        }, 1000);
+      });
+    }
+  }
 };
 </script>
 
@@ -152,6 +274,10 @@ export default {
       justify-content: space-between;
       padding: 20rpx 20rpx 0 20rpx;
       box-sizing: border-box;
+      /* 用户已收藏的显示图标 */
+      .icon_select_color {
+        color: #000;
+      }
       .title {
         display: flex;
         flex-direction: row;
@@ -212,7 +338,7 @@ export default {
     }
     /* 门票价格样式 */
     .TicketPrice {
-      font-size: var(--navFontSize);    
+      font-size: var(--navFontSize);
       height: 100rpx;
       line-height: 100rpx;
       .PriceTitle {
@@ -233,5 +359,41 @@ export default {
     }
   }
   /* 旅游日志 */
+  /* 日志发表区域 */
+  .travellog {
+    margin: 20rpx 20rpx 0 20rpx;
+    .title {
+      padding: 30rpx 0 20rpx 20rpx;
+      color: var(--themeColor);
+      font-size: var(--titleSize);
+      font-weight: bolder;
+      border-top-left-radius: 20rpx;
+      border-top-right-radius: 20rpx;
+      border-bottom: 2rpx solid #ededed;
+      background-color: #fff;
+    }
+    .sugs {
+      margin-bottom: 40rpx;
+      width: 100%;
+      background-color: #fff;
+      border-bottom: 2rpx solid #ededed;
+    }
+    .imgUp {
+      margin: 0 auto;
+      padding-left: 20rpx;
+      // border: 4rpx solid red;
+    }
+    .sumbit {
+      margin: 0 20rpx;
+      height: 100rpx;
+      line-height: 100rpx;
+      color: white;
+      font-size: 32upx;
+      font-weight: bolder;
+      text-align: center;
+      border-radius: 50rpx;
+      background-color: var(--themeColor);
+    }
+  }
 }
 </style>

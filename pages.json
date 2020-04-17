@@ -28,7 +28,7 @@
 		{
 			"path": "pages/page/index/searchRerult",
 			"style": {
-				"navigationBarBackgroundColor": "#000000",
+				"navigationBarBackgroundColor": "#0ea391",
 				"navigationBarTextStyle": "white",
 				"onReachBottomDistance": 50,
 				"usingComponents": {
