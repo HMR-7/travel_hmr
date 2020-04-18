@@ -110,8 +110,8 @@ export default {
     let t = this;
     t.getIndexGoodsList();
     console.log(t.goodsList, "首页推荐列表");
-    let time = t.test(t.getIndexGoodsList);
-    console.log(time, "函数执行时间");
+    // let time = t.test(t.getIndexGoodsList);
+    // console.log(time, "函数执行时间");
   },
 
   methods: {

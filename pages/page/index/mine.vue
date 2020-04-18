@@ -20,14 +20,14 @@
     <view class="action">
       <!-- 我的收藏 -->
       <view class="action_line" @tap="toCollectList">
-        <view class="number" v-if="userId==null">0</view>
-        <view class="number" v-if="userId!=null">{{GoodsInfo.favoriteNum}}</view>
+        <view class="number" v-if="listNum.CollectList==null">0</view>
+        <view class="number" v-if="user_id!=null">{{listNum.CollectList}}</view>
         <view class="caption">我的收藏</view>
       </view>
       <!-- 我的足迹 -->
       <view class="action_line" @tap="toMyFootprint">
-        <view class="number" v-if="userId==null">0</view>
-        <view class="number" v-if="userId!=null">{{GoodsInfo.activeNum}}</view>
+        <view class="number" v-if="listNum.CollectList==null">0</view>
+        <view class="number" v-if="user_id!=null">{{listNum.FooterList}}</view>
         <view class="caption">我的足迹</view>
       </view>
     </view>
@@ -61,16 +61,20 @@
 export default {
   data() {
     return {
+      user_id: "", //用户id
+      userInfo: "", //用户信息
+      listNum: "", //用户已收藏、足迹列表数量
       show: false, //显示电话客服
       isLogin: false,
-      userInfo: "", //用户信息
       sysInfo: ""
     };
   },
-  created() {
+  onPullDownRefresh() {
     let t = this,
       userInfo = uni.getStorageSync("userInfo"),
-      sysInfo = uni.getStorageSync("sysInfo");
+      sysInfo = uni.getStorageSync("sysInfo"),
+      user_id = uni.getStorageSync("UserId");
+    t.user_id = user_id;
     let login = t.$utils.checkLogin();
     if (!login) {
       t.isLogin = false;
@@ -79,10 +83,59 @@ export default {
       t.isLogin = true;
       t.userInfo = userInfo;
       t.sysInfo = sysInfo;
-      console.log(1111);
+    }
+    t.getListNum();
+    uni.stopPullDownRefresh();
+  },
+  created() {
+    let t = this,
+      userInfo = uni.getStorageSync("userInfo"),
+      sysInfo = uni.getStorageSync("sysInfo"),
+      user_id = uni.getStorageSync("UserId");
+    t.user_id = user_id;
+    let login = t.$utils.checkLogin();
+    if (!login) {
+      t.isLogin = false;
+      return;
+    } else {
+      t.isLogin = true;
+      t.userInfo = userInfo;
+      t.sysInfo = sysInfo;
     }
   },
+  onShow() {
+    let t = this;
+    t.getListNum();
+  },
+  onLoad() {},
   methods: {
+    /* 获取收藏和足迹列表长度 */
+    getListNum() {
+      let t = this;
+      let data = {
+        id: t.user_id
+      };
+      t.$utils.ajax(t.$api.userInfo, "get", data, res => {
+        console.log(res, "11111");
+        let listLength = {};
+        listLength.CollectList = res.CollectList;
+        listLength.FooterList = res.FooterList;
+        uni.setStorageSync("listNum", listLength);
+        t.listNum = uni.getStorageSync("listNum");
+      });
+    },
+    /* 查看用户已收藏列表 */
+    toCollectList() {
+      uni.navigateTo({
+        url: "./collectList"
+      });
+    },
+    /* 获取用户足迹列表 */
+    toMyFootprint(){
+      uni.navigateTo({
+         url: './myFootprint'
+      });
+    },
     /* 拨打客服电话 */
     Call(phone) {
       console.log(phone);
@@ -101,6 +154,7 @@ export default {
       let t = this;
       t.$utils.setClipboardData(str);
     },
+    /* 跳转到日志发布详情页面 */
     toTravellog() {
       uni.navigateTo({
         url: "./search?log=1"

@@ -58,11 +58,14 @@
         >所在地：{{goodDetail.address}}</view>
         <view
           class="place mar_bottom"
-          v-if="isCost!==0"
+          v-if="goodDetail.good_price==undefined"
+          style="color:var(--priceColor)"
+        >门票价：--元/起</view>
+        <view
+          class="place mar_bottom"
+          v-if="goodDetail.good_price!=undefined"
           style="color:var(--priceColor)"
         >门票价：{{goodDetail.good_price}}元/起</view>
-        <!-- <view>销量0米</view>
-        <view>剩余库存：10000米</view>-->
       </view>
     </view>
     <!-- 门票信息 -->
@@ -73,6 +76,11 @@
         <view class="PriceTitle">
           成人票
           <view
+            v-if="goodDetail.good_price==undefined"
+            style="font-size:24rpx;font-weight:bolder;color: var(--priceColor); "
+          >￥--元/起</view>
+          <view
+            v-if="goodDetail.good_price!=undefined"
             style="font-size:24rpx;font-weight:bolder;color: var(--priceColor); "
           >￥{{goodDetail.good_price}}元/起</view>
         </view>
@@ -81,6 +89,11 @@
         <view class="PriceTitle">
           儿童票
           <view
+            v-if="goodDetail.childTicket==undefined"
+            style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
+          >￥--元/起</view>
+          <view
+            v-if="goodDetail.childTicket!=undefined"
             style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
           >￥{{goodDetail.childTicket}}元/起</view>
         </view>
@@ -121,6 +134,10 @@ export default {
   created() {
     let t = this;
     t.user_id = uni.getStorageSync("UserId");
+    t.goodDerail = {
+      childTicket: "--",
+      good_price: "--"
+    };
   },
   onLoad(options) {
     let t = this;
@@ -138,6 +155,7 @@ export default {
     // t.good_name = options.name;
     t.good_id = options.id;
     t.getGoodDetail();
+    t.intoFooterList();
   },
   methods: {
     /* 获取商品详情 */
@@ -152,6 +170,17 @@ export default {
         t.goodDetail = res[0];
         t.imgArr = res[0].swipeArr;
         t.isCollect = res[1].iscollect;
+      });
+    },
+    /* 记录用户足迹 */
+    intoFooterList() {
+      let t = this;
+      let data = {
+        user_id: t.user_id,
+        good_id: t.good_id
+      };
+      t.$utils.ajax(t.$api.userFooter, "post", data, res => {
+        console.log(res);
       });
     },
     /* 用户点击收藏 */
@@ -176,17 +205,21 @@ export default {
       }
       t.$utils.ajax(t.$api.userCollect, "post", data, res => {
         console.log(res);
-        if (res.flag == "yes") {
-          t.isCollect = !t.isCollect;
+        console.log(res[1], "收藏字段");
+        if (res.msg == "取消收藏成功") {
+          t.isCollect = 0;
+          setTimeout(() => {
+            t.$utils.showToast("已取消收藏");
+          }, 300);
+        } else if (res.msg == "添加收藏成功") {
+          t.isCollect = 1;
+          setTimeout(() => {
+            t.$utils.showToast("收藏成功");
+          }, 300);
+          console.log(t.isCollect);
         }
-        if(t.isCollect){
-          setTimeout(() => {
-            t.$utils.showToast('收藏成功');
-          }, 300);
-        } else if(!t.isCollect){
-          setTimeout(() => {
-            t.$utils.showToast('已取消收藏');
-          }, 300);
+        if (t.isCollect == 1) {
+        } else if (t.isCollect == 0) {
         }
       });
     },
@@ -241,6 +274,9 @@ export default {
 
 <style lang="less">
 .content {
+  [v-cloak] {
+    display: none;
+  }
   width: 100%;
   min-height: 100vh;
   background-color: var(--contentBgc);

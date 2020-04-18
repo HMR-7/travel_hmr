@@ -58,6 +58,7 @@
 export default {
   data() {
     return {
+      userInfo: "",
       openid: "", //用户openId
       userPhone: "", //用户手机号
       userName: "", //用户名
@@ -99,9 +100,10 @@ export default {
     let t = this;
     let authSetting_userInfo = uni.getStorageSync("authSetting.userInfo");
     let userInfo = uni.getStorageSync("userInfo");
+    t.userInfo = userInfo;
     let sysInfo = { phone: "17853558905", wxNum: "huangmaorui102117" };
+    t.sysInfo = sysInfo;
     uni.setStorageSync("sysInfo", sysInfo);
-
     console.log(authSetting_userInfo, "------");
     console.log(userInfo);
   },
@@ -119,6 +121,8 @@ export default {
         success: res => {
           console.log(res, "res");
           if (res.code) {
+            console.log(t.code, "t.code");
+
             t.code = res.code;
             t.getUserChart();
           } else {
@@ -141,15 +145,19 @@ export default {
         "get",
         data,
         res => {
-          console.log(res, "获取openid");
+          console.log(res.openid, "获取openid");
           t.openid = res.openid;
           let data = {
             openid: res.openid
           };
           t.$utils.ajax(t.$api.userInfo, "get", data, res => {
             console.log(res, "用户表信息");
-            uni.setStorageSync('UserId', res.id)
-            if (res) {
+            uni.setStorageSync("UserId", res.id);
+            let listLength = {};
+            listLength.CollectList = res.CollectList;
+            listLength.FooterList = res.FooterList;
+            uni.setStorageSync("listNum", listLength);
+            if (res.openid) {
               console.log("用户已经存在");
               t.$utils.showToast("验证通过", "/static/img/loginSuccess.png");
               setTimeout(() => {
@@ -159,14 +167,16 @@ export default {
                 });
               }, 1000);
               return;
-            } else {
+            } else if (res.msg == false) {
               let data = {
                 openid: t.openid,
-                userName: userInfo.nickName,
-                userPhone: phone
+                userName: t.userInfo.nickName,
+                userPhone: t.sysInfo.phone
               };
-              t.$utils.ajax(t.$api.userInfo, "post", data, res => {
-                console.log(res);
+              t.$utils.ajax(t.$api.insertuserInfo, "post", data, res => {
+                console.log(res, "999999999");
+                uni.setStorageSync("UserId", res[0].id);
+
                 uni.switchTab({
                   url: "../index/index"
                 });
@@ -197,12 +207,6 @@ export default {
           uni.setStorageSync("userInfo", t.userRes);
           t.ischecked = false;
           t.getNumberLength(t.userPhone);
-          // setTimeout(() => {
-          //   uni.hideToast();
-          //   uni.redirectTo({
-          //     url: "../index/index1"
-          //   });
-          // }, 1000);
         }
       });
     },
@@ -215,7 +219,6 @@ export default {
       if (phone.length == 11 && t.timeStart == true) {
         t.isCodeActive = 1;
         console.log("11111111111");
-
         return;
       }
       if (
