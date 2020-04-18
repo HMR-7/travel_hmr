@@ -69,8 +69,6 @@ app.get("/userInfo", function (req, res) {
                 }
             })
         })
-
-
     } else {
         conn.query(sql, function (err, result) {
             let _res = JSON.stringify(result)
@@ -107,12 +105,7 @@ app.get("/userInfo", function (req, res) {
                     }
                 })
             }
-            // if (err) {
-            //     console.log("连接失败", err);
-            // } else {
-            //     
-            //     res.send(data);
-            // }
+       
         })
     }
 });
@@ -451,7 +444,6 @@ app.post("/userFooter", function (req, res) {
         if (!data.user_id) {
             return;
         }
-        // order by A desc,B   这个时候 A 降序，B 升序排列
         const selectsql = "select id from footer where user_id=" + data.user_id + " and good_id = " + data.good_id;
         conn.query(selectsql, function (err, result) {
             /* 去除RowData */
@@ -498,33 +490,53 @@ app.post("/userFooter", function (req, res) {
                     }
                 })
             }
-            // if (err) {
-            //     res.send({
-            //         msg: "足迹添加失败"
-            //     })
-            // } else {
-            //     res.send({
-            //         msg: "足迹添加成功"
-            //     })
-            // }
 
         })
-        // const insertsql = "insert into footer(user_id,good_id,time) values(?,?,?)"
-        // conn.query(insertsql, function (err, result) {
-        //     if (err) {
-        //         res.send({
-        //             msg: "足迹添加失败"
-        //         })
-        //     } else {
-        //         res.send({
-        //             msg: "足迹添加成功"
-        //         })
-        //     }
-        // })
+        
     })
 })
 
 /* 查看用户足迹列表 */
+app.get("/getFooterList", function (req, res) {
+    let reData = req.query;
+    if (!reData.user_id) {
+        return
+    }
+    let limit = Number(reData.page - 1) * Number(reData.limit);
+    console.log(req.query, 'get请求前端传递到后端的参数')
+    const selcollectsql = "SELECT good_id FROM footer where user_id =" + reData.user_id + " order by time desc" + " limit " + limit + "," + reData.limit
+    console.log(selcollectsql, '--------------------------------')
+    conn.query(selcollectsql, function (err, result) {
+        let _res = JSON.stringify(result)
+        let data = JSON.parse(_res)
+        console.log(data, '查询出来的数据');
+        if (data.length == 0) {
+            res.send(data)
+            return
+        }
+        var dataArr = [];
+        var i = 0;
+        (function run() {
+            const seldetailsql = "SELECT * FROM detail where id =" + data[i].good_id
+            conn.query(seldetailsql, function (err, result) {
+                let _res = JSON.stringify(result)
+                let _data = JSON.parse(_res)
+                dataArr.push(_data[0])
+                console.log(_data, '循环中的查找数据');
+                if (i <= data.length) {
+                    i++;
+                    if (i == data.length) {
+                        console.log(dataArr, '循环完毕');
+                        res.send(dataArr)
+                    } else {
+                        run();
+                    }
+
+                }
+            })
+        }())
+    })
+})
 app.listen(3000, () => {
     console.log('服务器已启动');
 
