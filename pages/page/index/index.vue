@@ -53,25 +53,27 @@
           class="shop_details"
           v-for="(item,index) in goodsList"
           :key="index"
-          @click="toDetail(item.id,item.good_name)"
         >
-          <view class="goods_image">
-            <image :src="item.src" mode="modeFix" />
-          </view>
-          <!-- </view> -->
-          <view class="goods_meg">
-            <view class="title" v-if="(item.good_name)!=null">{{item.good_name}}</view>
-            <view class="title" v-if="(item.good_name)==null">暂无景点名称</view>
-            <span selectable="true" class="goods_num">
-              16:00前均可购买门票
-              <!-- <text class="goods_num iconfont icon-fuzhi"></text> -->
-            </span>
-            <span selectable="true" class="goods_num" v-if="(item.good_price)==null">暂时商品货号</span>
-            <view class="goods_meg_bottom">
-              <view class="price">￥{{item.good_price}}元/起</view>
-              <view class="goDetail">详情</view>
+          <!-- @click="toDetail(item.id,item.good_name)" -->
+          <to-detail :list='goodsList' :index='item.id' :detailtitle='item.good_name'>
+            <view class="goods_image">
+              <image :src="item.src" mode="modeFix" />
             </view>
-          </view>
+            <!-- </view> -->
+            <view class="goods_meg">
+              <view class="title" v-if="(item.good_name)!=null">{{item.good_name}}</view>
+              <view class="title" v-if="(item.good_name)==null">暂无景点名称</view>
+              <span selectable="true" class="goods_num">
+                16:00前均可购买门票
+                <!-- <text class="goods_num iconfont icon-fuzhi"></text> -->
+              </span>
+              <span selectable="true" class="goods_num" v-if="(item.good_price)==null">暂时商品货号</span>
+              <view class="goods_meg_bottom">
+                <view class="price">￥{{item.good_price}}元/起</view>
+                <view class="goDetail">详情</view>
+              </view>
+            </view>
+          </to-detail>
         </view>
       </view>
     </view>
@@ -79,7 +81,11 @@
 </template>
 
 <script>
+import toDetail from "@/components/toDetail";
 export default {
+  components: {
+    toDetail
+  },
   data() {
     return {
       imgArr: [
@@ -194,14 +200,14 @@ export default {
       });
     },
     /* 查看景点详情 */
-    toDetail(good_id, good_name) {
-      console.log(good_id, "景点id");
-      setTimeout(() => {
-        uni.navigateTo({
-          url: "../index/detail?id=" + good_id + "&&name=" + good_name
-        });
-      }, 150);
-    },
+    // toDetail(good_id, good_name) {
+    //   console.log(good_id, "景点id");
+    //   setTimeout(() => {
+    //     uni.navigateTo({
+    //       url: "../index/detail?id=" + good_id + "&&name=" + good_name
+    //     });
+    //   }, 150);
+    // },
     /* 前往搜索页面 */
     toSearch() {
       let t = this;
@@ -374,7 +380,7 @@ export default {
               height: 60rpx;
               line-height: 60rpx;
               text-align: center;
-              margin-right: 15rpx;
+              margin-right: 20rpx;
               /* background-color: #dd3333; */
               background-color: var(--themeColor);
             }
