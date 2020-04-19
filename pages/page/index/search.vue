@@ -396,7 +396,7 @@ export default {
           height: 130rpx;
           .title {
             width: 95%;
-            margin: 10rpx;
+            padding: 10rpx;
             overflow: hidden;
             white-space: pre-wrap;
             text-overflow: ellipsis;

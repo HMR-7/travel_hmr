@@ -3,4 +3,7 @@ node_modules
 /pages/siteinfo
 /unpackage
 unpackage
-serve
+serve.js
+/components
+components
+/pages/page/index/test.vue

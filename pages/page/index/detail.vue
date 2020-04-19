@@ -1,5 +1,5 @@
 <template>
-  <view class="content">
+  <view class="content" v-if="goodDetail">
     <!-- 轮播图 -->
     <swiper
       class="img-container"
@@ -16,7 +16,7 @@
             class="itemImg"
             :class="{active:currentIndex==index}"
             :src="item"
-            @tap="previewImage(item)"
+            @tap="previewImage(item,index)"
           />
         </swiper-item>
       </block>
@@ -68,39 +68,72 @@
         >门票价：{{goodDetail.good_price}}元/起</view>
       </view>
     </view>
+    <!-- 门票信息-使用自定义滑动组件 -->
+    <!-- <swiper-action @swiperAction="handleSwiperAction">
+      <view class="TicketMegs">
+        <view class="title">门票信息</view>
+        <view class="TicketPrice">
+          <view class="PriceTitle">
+            成人票
+            <view
+              v-if="goodDetail.good_price==undefined"
+              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor); "
+            >￥--元/起</view>
+            <view
+              v-if="goodDetail.good_price!=undefined"
+              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor); "
+            >￥{{goodDetail.good_price}}元/起</view>
+          </view>
+        </view>
+        <view class="TicketPrice">
+          <view class="PriceTitle">
+            儿童票
+            <view
+              v-if="goodDetail.childTicket==undefined"
+              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
+            >￥--元/起</view>
+            <view
+              v-if="goodDetail.childTicket!=undefined"
+              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
+            >￥{{goodDetail.childTicket}}元/起</view>
+          </view>
+        </view>
+        <view class="selMorePrice">详情可到景区售票处询问</view>
+      </view>
+    </swiper-action> -->
     <!-- 门票信息 -->
     <view class="TicketMegs">
-      <view class="title">门票信息</view>
-      <!-- 门票价格 -->
-      <view class="TicketPrice">
-        <view class="PriceTitle">
-          成人票
-          <view
-            v-if="goodDetail.good_price==undefined"
-            style="font-size:24rpx;font-weight:bolder;color: var(--priceColor); "
-          >￥--元/起</view>
-          <view
-            v-if="goodDetail.good_price!=undefined"
-            style="font-size:24rpx;font-weight:bolder;color: var(--priceColor); "
-          >￥{{goodDetail.good_price}}元/起</view>
+        <view class="title">门票信息</view>
+        <!-- 门票价格 -->
+        <view class="TicketPrice">
+          <view class="PriceTitle">
+            成人票
+            <view
+              v-if="goodDetail.good_price==undefined"
+              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor); "
+            >￥--元/起</view>
+            <view
+              v-if="goodDetail.good_price!=undefined"
+              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor); "
+            >￥{{goodDetail.good_price}}元/起</view>
+          </view>
         </view>
-      </view>
-      <view class="TicketPrice">
-        <view class="PriceTitle">
-          儿童票
-          <view
-            v-if="goodDetail.childTicket==undefined"
-            style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
-          >￥--元/起</view>
-          <view
-            v-if="goodDetail.childTicket!=undefined"
-            style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
-          >￥{{goodDetail.childTicket}}元/起</view>
+        <view class="TicketPrice">
+          <view class="PriceTitle">
+            儿童票
+            <view
+              v-if="goodDetail.childTicket==undefined"
+              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
+            >￥--元/起</view>
+            <view
+              v-if="goodDetail.childTicket!=undefined"
+              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
+            >￥{{goodDetail.childTicket}}元/起</view>
+          </view>
         </view>
+        <!-- 详情咨询提示 -->
+        <view class="selMorePrice">详情可到景区售票处询问</view>
       </view>
-      <!-- 详情咨询提示 -->
-      <view class="selMorePrice">详情可到景区售票处询问</view>
-    </view>
     <!-- 用户日志发布区域 -->
     <view class="travellog" v-if="log==1">
       <view class="title">旅游日志</view>
@@ -117,7 +150,11 @@
 </template>
 
 <script>
+import { swiperAction } from "@/components/swiperAction";
 export default {
+  components: {
+    swiperAction
+  },
   data() {
     return {
       isCollect: "", //是否被用户收藏
@@ -224,10 +261,11 @@ export default {
       });
     },
     /* 轮播图点击预览 */
-    previewImage(item) {
+    previewImage(item,index) {
       let t = this,
         imgSrc = t.imgArr;
       uni.previewImage({
+        current:index,
         urls: imgSrc
       });
     },
@@ -267,6 +305,11 @@ export default {
           });
         }, 1000);
       });
+    },
+    /* 滑动事件 */
+    handleSwiperAction(e) {
+      // 获取子组件传递的数据
+      console.log(e);
     }
   }
 };

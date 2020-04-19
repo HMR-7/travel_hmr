@@ -18,20 +18,34 @@
             v-if="userId&&is_image_search"
           ></span>
         </view>
-        <view class="allClass" style="color:#fff;text-align:center">
+        <!-- <view class="allClass" style="color:#fff;text-align:center">
           <view style="font-size:24rpx;font-weight:bolder">搜索</view>
-        </view>
+        </view>-->
       </view>
     </view>
+    <!-- 主页推荐表 -->
     <view class="listContent" style="padding-top:100rpx">
-      <view class="navList">
-        <view class="nav" v-for="(item,index) in navList" :key="index">
-          <view class="navImage">
-            <img :src="item.src" alt />
-          </view>
-          <view class="navTitle">{{item.title}}</view>
-        </view>
-      </view>
+      <!-- 轮播图 -->
+      <swiper
+        class="img-container"
+        indicator-dots="true"
+        indicator-color="var(--detailColor)"
+        indicator-active-color="var(--themeColor)"
+        circular
+        autoplay
+      >
+        <block v-for="(item, index) in imgArr" :key="index">
+          <swiper-item class="item">
+            <!-- <view class="swiper_title">{{item.title}}</view> -->
+            <image
+              class="itemImg"
+              :class="{active:currentIndex==index}"
+              :src="item"
+              @tap="previewImage(item,index)"
+            />
+          </swiper-item>
+        </block>
+      </swiper>
       <!-- 商品列表 v-for-->
       <view class="list_head">- 热门推荐 -</view>
       <view class="list_shop">
@@ -68,6 +82,13 @@
 export default {
   data() {
     return {
+      imgArr: [
+        "http://img.alicdn.com/i3/170090268524400251/TB2zhofXhvzQeBjSZPfXXbWGFXa_!!0-travel.jpg",
+        "https://img.alicdn.com/tfscom/TB1e8Cef8DH8KJjSszcSuvDTFXa",
+        "https://img.alicdn.com/tfscom/TB1o6_Zk6qhSKJjSspnSuw79XXa",
+        "http://img.alicdn.com/i3/152410264913421435/TB2092suXXXXXXlXXXXXXXXXXXX_!!0-travel.jpg",
+        "http://img.alicdn.com/i4/152410264913477409/TB2EeqQuXXXXXa6XpXXXXXXXXXX_!!0-travel.jpg"
+      ],
       navList: [
         { id: 1, title: "景点门票", src: "../../../static/images/jdmp.png" },
         { id: 2, title: "酒店住宿", src: "../../../static/images/jdzs.png" },
@@ -128,6 +149,15 @@ export default {
       let t = this;
       console.log(str);
       t.$utils.setClipboardData(str);
+    },
+    /* 轮播图点击预览 */
+    previewImage(item, index) {
+      let t = this,
+        imgSrc = t.imgArr;
+      uni.previewImage({
+        current: index,
+        urls: imgSrc
+      });
     },
     /* 热门推荐列表 */
     getIndexGoodsList() {
@@ -198,15 +228,12 @@ export default {
     box-sizing: border-box;
     background-color: var(--themeColor);
     .find {
+      margin: auto 20rpx;
       display: flex;
       flex-direction: row;
       justify-content: space-between;
-      /* position: relative; */
-      margin: auto 0;
-      width: 86%;
+      width: 100%;
       height: 60rpx;
-      /* border: 3rpx solid #dd3333; */
-      margin-left: 20rpx;
       background-color: #f5f5f9;
       clear: both;
     }
@@ -216,7 +243,22 @@ export default {
       margin-right: 30rpx;
     }
   }
-
+  /* 轮播图 */
+  .img-container {
+    height: 400rpx;
+    width: 100%;
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    .item {
+      height: 100%;
+      .itemImg {
+        width: 100%;
+        height: 100%;
+        /* z-index: 5; */
+      }
+    }
+  }
   /* 商品详情 */
   .listContent {
     /* 头部标签 */

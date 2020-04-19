@@ -117,6 +117,20 @@
 					"van-count-down": "/wxcomponents/vant/dist/count-down/index"
 				}
 			}
+		},
+
+		{
+			"path": "pages/page/index/test",
+			"style": {
+				"navigationBarTitleText": "测试页面",
+				"navigationBarBackgroundColor": "#0ea391",
+				"navigationBarTextStyle": "white",
+				"onReachBottomDistance": 50,
+				"usingComponents": {
+					"van-field": "/wxcomponents/vant/dist/field/index",
+					"van-count-down": "/wxcomponents/vant/dist/count-down/index"
+				}
+			}
 		}
 	],
 	"globalStyle": {

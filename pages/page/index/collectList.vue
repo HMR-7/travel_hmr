@@ -28,7 +28,7 @@
                     class="prize"
                     style="color:var(--priceColor);font-size:var(--priceSize); font-weight:bolder;"
                   >￥{{item.good_price}}元/起</view>
-                  <view class="goShop">详情</view>
+                  <!-- <view class="goShop">详情</view> -->
                 </view>
               </view>
             </view>
