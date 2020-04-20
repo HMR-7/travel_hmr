@@ -509,7 +509,6 @@ app.post("/userFooter", function (req, res) {
 
     })
 })
-
 /* 查看用户足迹列表 */
 app.get("/getFooterList", function (req, res) {
     let reData = req.query;
@@ -550,6 +549,17 @@ app.get("/getFooterList", function (req, res) {
             })
         }())
     })
+})
+/* 酒店推荐表 */
+app.get("/getHotelList", function (req, res) {
+    let reData = req.query;
+    const sql = 'select * from hotel where good_id=' + reData.good_id;
+    conn.query(sql, function (err, result) {
+        let _res = JSON.stringify(result)
+        let data = JSON.parse(_res)
+        res.send(data)
+    })
+
 })
 app.listen(3000, () => {
     console.log('服务器已启动');
