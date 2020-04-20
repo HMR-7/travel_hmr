@@ -1,7 +1,7 @@
-/* 公司地址 */
-const http = 'http://192.168.88.121:3000/'
+// /* 公司地址 */
+// const http = 'http://192.168.88.121:3000/'
 /* 家用地址 */
-// const http = 'http://192.168.1.106:3000/'
+const http = 'http://192.168.1.106:3000/'
 
 const api = {
     userInfo: http + 'userInfo', //用户登录
@@ -16,8 +16,9 @@ const api = {
     userFooter: http + 'userFooter', //添加、更新用户足迹表
     getCollectList: http + 'getCollectList', //查看用户收藏列表详情
     getFooterList: http + 'getFooterList', //查看用户足迹列表详情
-    getHotelList: http + 'getHotelList' //获取景点到酒店推荐
-
+    getHotelList: http + 'getHotelList', //获取景点到酒店推荐
+    getFoodList : http + 'getFoodList' ,//获取本地美食推荐
+    getTravelLog : http + 'getTravelLog' //获取旅游日志
 }
 
 export default api

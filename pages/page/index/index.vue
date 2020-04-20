@@ -49,13 +49,9 @@
       <!-- 商品列表 v-for-->
       <view class="list_head">- 热门推荐 -</view>
       <view class="list_shop">
-        <view
-          class="shop_details"
-          v-for="(item,index) in goodsList"
-          :key="index"
-        >
+        <view class="shop_details" v-for="(item,index) in goodsList" :key="index">
           <!-- @click="toDetail(item.id,item.good_name)" -->
-          <to-detail :list='goodsList' :index='item.id' :detailtitle='item.good_name'>
+          <to-detail :list="goodsList" :index="item.id" :detailtitle="item.good_name">
             <view class="goods_image">
               <image :src="item.src" mode="modeFix" />
             </view>
@@ -82,6 +78,8 @@
 
 <script>
 import toDetail from "@/components/toDetail";
+import moment from "moment";
+moment.locale("zh-cn");
 export default {
   components: {
     toDetail
@@ -137,6 +135,11 @@ export default {
     let t = this;
     t.getIndexGoodsList();
     console.log(t.goodsList, "首页推荐列表");
+    t.getTravelLog();
+    console.log(new Date().getTime());
+    
+    console.log(moment(1573859402543).fromNow(), "事件");
+
     // let time = t.test(t.getIndexGoodsList);
     // console.log(time, "函数执行时间");
   },
@@ -149,6 +152,16 @@ export default {
       let end = new Date().getTime();
       console.log(end);
       return end - start + "ms";
+    },
+    getTravelLog(){
+      let t=this;
+      t.$utils.ajax(t.$api.getTravelLog,'get','',res=>{
+        console.log(res,'旅游日志');
+        res.forEach(v=>{
+          console.log(moment(v.time).fromNow(),'相对时间');
+          
+        })
+      })
     },
     /* 一键复制 */
     Copy(str) {

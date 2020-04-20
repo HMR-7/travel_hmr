@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import App from './App'
-Vue.config.productionTip = false
+
+// Vue.config.productionTip = false
 
 //工具类
 import utils from './pages/utils/utils.js'

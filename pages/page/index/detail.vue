@@ -1,5 +1,6 @@
 <template>
   <view class="content" v-if="goodDetail">
+    
     <van-popup
       :show="closeCanvas"
       @close="toCloseCanvas"
@@ -67,6 +68,7 @@
           class="place mar_bottom"
           v-if="goodDetail.address!=null"
           style="
+        width: 500rpx;
         color: #7a7e83;
         "
         >地址：{{goodDetail.address}}</view>
@@ -148,10 +150,23 @@
       <!-- 详情咨询提示 -->
       <view class="selMorePrice">详情可到景区售票处询问</view>
     </view>
+    <!-- 美食推荐列表 -->
+    <view
+      style="margin:20rpx;border-radius: 20rpx;overflow: hidden;box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);"
+    >
+      <view class="scrollTitle">蓬莱美食推荐</view>
+      <scroll-view class="foodScroll" scroll-y="true" @scrolltolower="refrechFoodList">
+        <view v-for="(item,index) in foodList" :key="index">
+          <view class="foodTitle">{{item.food_name}}</view>
+        </view>
+      </scroll-view>
+    </view>
     <!-- 附近酒店信息 -->
     <view class="TicketMegs">
       <view class="title">附近酒店信息</view>
-      <!-- 门票价格 -->
+      <view class="TicketPrice" v-if="hotelList.length==0" style="text-align:center;">暂无可推荐酒店</view>
+
+      <!-- 酒店信息价格 -->
       <view class="TicketPrice" v-for="(item,index) in hotelList" :key="index">
         <view class="PriceTitle" @tap="hotelDetail(item.id)">
           <view v-if="item.hotel_name==undefined" style="font-size:32rpx;">--</view>
@@ -163,7 +178,7 @@
           <view
             v-if="item.hotel_price!=null"
             style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
-          >¥{{item.hotel_price}}元/晚</view>
+          >¥{{item.hotel_price}}元/起</view>
           <!--   <view
             v-if="item.hotel_name==undefined"
             style="font-size:24rpx;font-weight:bolder;color: var(--priceColor); "
@@ -203,7 +218,7 @@
           <view
             class="hotelPrice"
             style="color:var(--priceColor)"
-          >¥{{hotelDetailMegs[0].hotel_price}}元/晚</view>
+          >¥{{hotelDetailMegs.hotel_price}}元/起</view>
         </view>
         <view class="hotelPhone"></view>
       </view>
@@ -218,17 +233,24 @@
       >生成海报</view>
     </view>
     <!-- 用户日志发布区域 -->
-    <view class="travellog" v-if="log==1">
-      <view class="title">旅游日志</view>
-      <textarea
-        class="sugs"
-        placeholder-style="padding-left:20rpx"
-        placeholder="请输入内容"
-        maxlength="-1"
-        @input="onInput"
-      ></textarea>
-      <view class="sumbit" @tap="confirm">提交</view>
-    </view>
+    <view
+      @tap="writeLog=true"
+      class="iconfont icon-tianxie"
+      style="color:var(--themeColor);font-size:80rpx;position: fixed;top: 80%;left: 86%;background-color: var(--contentBgc);border-radius: 100%;background: rgba(0,0,0,0);}"
+    ></view>
+    <van-popup :show="writeLog" position="bottom" @close="writeLog=false">
+      <view class="travellog" v-if="writeLog">
+        <view class="title">旅游日志</view>
+        <textarea
+          class="sugs"
+          placeholder-style="padding-left:20rpx"
+          placeholder="请输入内容"
+          maxlength="-1"
+          @input="onInput"
+        ></textarea>
+        <view class="sumbit" @tap="confirm">提交</view>
+      </view>
+    </van-popup>
   </view>
 </template>
 
@@ -240,7 +262,9 @@ export default {
   },
   data() {
     return {
+      page: 1, //食物列表的页数
       isCollect: "", //是否被用户收藏
+      writeLog:false,//是否显示日志页面
       log: 0, //判断是否是日志发布
       user_id: "", //用户id
       good_id: "", //景点id
@@ -249,6 +273,7 @@ export default {
       hotelList: [], //附近酒店列表
       showHotelDetail: false, //获取用户点击的酒店详情
       hotelDetailMegs: [], //酒店详情
+      foodList: [], //获取美食推荐列表
       imgArr: "", //轮播图
       isCollect: "", //是否收藏
       suggests: null, //用户日志到发表内容
@@ -259,9 +284,14 @@ export default {
   },
   onPullDownRefresh() {
     let t = this;
+    t.page = 1;
     t.goodDetail = "";
+    t.hotelList = [];
+    t.foodList = [];
     t.getGoodDetail();
-    uni.stopPullDownRefresh;
+    t.getHotelList();
+    t.getFoodList();
+    uni.stopPullDownRefresh();
   },
   created() {
     let t = this;
@@ -288,6 +318,7 @@ export default {
     t.getGoodDetail();
     t.getHotelList();
     t.intoFooterList();
+    t.getFoodList();
   },
   methods: {
     /* 获取商品详情 */
@@ -336,6 +367,48 @@ export default {
       console.log(t.hotelDetailMegs, "酒店信息");
       if (t.hotelDetailMegs) {
         t.showHotelDetail = true;
+      }
+    },
+    /* 获取美食推荐列表 */
+    getFoodList() {
+      let t = this,
+        list = t.foodList,
+        page = t.page;
+      let data = {
+        page: page,
+        limit: 3
+      };
+      t.$utils.ajax(t.$api.getFoodList, "get", data, res => {
+        list = [...list, ...res];
+        console.log(list, "美食推荐列表");
+        if (list.length == 0 && page == 1) {
+          console.log(111);
+        }
+        if (res.length == 0 && page > 1) {
+          uni.showToast({
+            title: "没有更多了",
+            icon: "none",
+            duration: 2000,
+            success: () => {
+              t.page--;
+            }
+          });
+        } else {
+        }
+        t.foodList = list;
+      });
+    },
+    /* 加载美食列表 */
+    refrechFoodList() {
+      let t = this,
+        foodList = t.foodList;
+      /* 判断是否加载下一页 */
+      if (foodList.length < 3) {
+        console.log(111);
+        return;
+      } else if (foodList.length >= 3) {
+        t.page++;
+        t.getFoodList();
       }
     },
     /* 记录用户足迹 */
@@ -511,9 +584,9 @@ export default {
         uni.canvasToTempFilePath(
           {
             width: 350,
-            height: 250,
+            height: 225,
             destWidth: 350,
-            destHeight: 250,
+            destHeight: 225,
             canvasId: "myCanvas",
             success: function(res) {
               console.log(res, "生成了");
@@ -724,6 +797,7 @@ export default {
       justify-content: space-between;
       font-size: 24rpx;
       .hotelAddress {
+        width: 500rpx;
         color: #7a7e83;
         font-weight: bolder;
         box-sizing: border-box;
@@ -731,6 +805,29 @@ export default {
       .hotelPrice {
         box-sizing: border-box;
       }
+    }
+  }
+  /* 美食推荐列表 */
+  .scrollTitle {
+    padding: 30rpx 0 20rpx 20rpx;
+    color: var(--themeColor);
+    font-size: var(--titleSize);
+    font-weight: bolder;
+    border-bottom: 2rpx solid #ededed;
+    background-color: #fff;
+  }
+  .foodScroll {
+    height: 300rpx;
+    background-color: #fff;
+    .foodTitle {
+      margin: 0 20rpx;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      font-size: var(--navFontSize);
+      height: 100rpx;
+      line-height: 100rpx;
+      border-bottom: 2rpx solid #ededed;
     }
   }
   /* 页面分享模块 */
@@ -768,7 +865,7 @@ export default {
   /* 旅游日志 */
   /* 日志发表区域 */
   .travellog {
-    margin: 20rpx 20rpx 0 20rpx;
+    margin-bottom :20rpx;
     .title {
       padding: 30rpx 0 20rpx 20rpx;
       color: var(--themeColor);
