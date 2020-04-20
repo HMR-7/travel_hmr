@@ -107,12 +107,6 @@ app.get("/userInfo", function (req, res) {
                     }
                 })
             }
-            // if (err) {
-            //     console.log("连接失败", err);
-            // } else {
-            //     
-            //     res.send(data);
-            // }
         })
     }
 });
@@ -221,7 +215,22 @@ app.get("/getKeywords", function (req, res) {
 
 
 });
-
+/* 用户主页搜索获取结果 */
+app.get("/getKeyWordSearchList", function (req, res) {
+    let reData = req.query;
+    console.log(reData, '商品详情的前端参数');
+    let limit = Number(reData.page - 1) * Number(reData.limit);
+    const sql = "SELECT * FROM detail where good_name like '%" + reData.keyword + "%' limit " + limit + "," + reData.limit;
+    conn.query(sql, function (err, result) {
+        if (err) {
+            console.log("连接失败", err);
+        } else {
+            let _res = JSON.stringify(result)
+            let data = JSON.parse(_res)
+            res.send(data);
+        }
+    })
+})
 /* 根据商品id获取商品详情 */
 app.get("/getSwiper", function (req, res) {
     let Sqldata = req.query;
@@ -525,6 +534,47 @@ app.post("/userFooter", function (req, res) {
 })
 
 /* 查看用户足迹列表 */
+app.get("/getFooterList", function (req, res) {
+    let reData = req.query;
+    if (!reData.user_id) {
+        return
+    }
+    let limit = Number(reData.page - 1) * Number(reData.limit);
+    console.log(req.query, 'get请求前端传递到后端的参数')
+    const selcollectsql = "SELECT good_id FROM footer where user_id =" + reData.user_id + " order by time desc" + " limit " + limit + "," + reData.limit
+    console.log(selcollectsql, '--------------------------------')
+    conn.query(selcollectsql, function (err, result) {
+        let _res = JSON.stringify(result)
+        let data = JSON.parse(_res)
+        console.log(data, '查询出来的数据');
+        if (data.length == 0) {
+            res.send(data)
+            return
+        }
+        var dataArr = [];
+        var i = 0;
+        (function run() {
+            const seldetailsql = "SELECT * FROM detail where id =" + data[i].good_id
+            conn.query(seldetailsql, function (err, result) {
+                let _res = JSON.stringify(result)
+                let _data = JSON.parse(_res)
+                dataArr.push(_data[0])
+                console.log(_data, '循环中的查找数据');
+                if (i <= data.length) {
+                    i++;
+                    if (i == data.length) {
+                        console.log(dataArr, '循环完毕');
+                        res.send(dataArr)
+                    } else {
+                        run();
+                    }
+
+                }
+            })
+        }())
+    })
+})
+
 app.listen(3000, () => {
     console.log('服务器已启动');
 
