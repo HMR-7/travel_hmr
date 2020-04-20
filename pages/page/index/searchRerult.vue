@@ -5,12 +5,16 @@
       <view class="list_show">
         <!-- 信息展示模块 -->
         <view class="goods" v-for="(item,index) in goodsList" :key="index">
-          <view class="top" @tap="toGoodsDetail(item.id)">
-            <image :src="item.image" />
+          <view class="top" @tap="toDetail(item.id)">
+            <image :src="item.src" />
           </view>
           <view class="bottom">
-            <view class="title">{{item.title}}</view>
-            <view class="price">￥{{item.price}}/米</view>
+            <view class="title">{{item.good_name}}</view>
+            <view class="introduce">{{item.introduce}}</view>
+            <view class="price">
+              <text>成人：{{item.good_price}}/元起</text>
+              <text>儿童：{{item.childTicket}}/元起</text>
+            </view>
           </view>
         </view>
       </view>
@@ -50,23 +54,42 @@ export default {
     t.getCateGoodList();
     uni.stopPullDownRefresh();
   },
+  /* 触底判断加载下一页 */
+  onReachBottom(options) {
+    let t = this,
+      goodsList = t.goodsList;
+    /* 判断是否加载下一页 */
+    if (goodsList.length < 8) {
+      console.log(111);
+      return;
+    } else if (goodsList.length >= 8) {
+      t.page++;
+      t.getCateGoodList();
+    }
+  },
   created() {},
   onLoad(options) {
     let t = this;
+    console.log(options, "oprions");
     t.queryData = options;
     console.log(options);
+    t.getCateGoodList();
   },
   methods: {
     /* 获取关键词搜索列表 */
     getCateGoodList() {
-      if (options.keyword) {
+      let t = this,
+        list = t.goodsList,
+        page = t.page,
+        queryData = t.queryData;
+      if (queryData.keyword) {
         t.imgShow = 0;
         let data = {
           page: page,
           limit: 8,
-          keyword: options.keyword
+          keyword: queryData.keyword
         };
-        t.$utils.ajax(t.$api.keyWordSearchList, "post", data, res => {
+        t.$utils.ajax(t.$api.getKeyWordSearchList, "get", data, res => {
           /* 数组拼接 */
           list = list.concat(res);
           console.log(list, "关键字搜索商品列表");
@@ -95,6 +118,15 @@ export default {
         });
         return;
       }
+    },
+    /* 查看景点详情 */
+    toDetail(good_id, good_name) {
+      console.log(good_id, "景点id");
+      setTimeout(() => {
+        uni.navigateTo({
+          url: "../index/detail?id=" + good_id + "&&name=" + good_name
+        });
+      }, 150);
     }
   }
 };
@@ -104,12 +136,14 @@ export default {
 .content {
   display: flex;
   flex-direction: column;
+  flex-direction: space-betwwen;
+  flex-wrap: wrap;
   width: 100%;
   min-height: 100vh;
-  flex-wrap: wrap;
+
   .list {
     width: 100%;
-    margin-top: 60rpx;
+    margin-top: 20rpx;
     .list_show {
       display: flex;
       flex-direction: row;
@@ -127,8 +161,6 @@ export default {
           image {
             width: 100%;
             height: 100%;
-            border-top-right-radius: 20rpx;
-            border-top-left-radius: 20rpx;
             border-radius: 20rpx;
           }
         }
@@ -136,6 +168,10 @@ export default {
           display: flex;
           flex-direction: column;
           height: 130rpx;
+          padding-bottom: 20rpx;
+          .tags {
+            border: 2rpx solid #0ea391;
+          }
           .title {
             display: -webkit-box;
             width: 95%;
@@ -144,14 +180,27 @@ export default {
             white-space: pre-wrap;
             text-overflow: ellipsis;
             -webkit-line-clamp: 2;
-            font-size: var(--titleSize);
+            font-size: 30rpx;
             font-weight: bolder;
             -webkit-box-orient: vertical;
           }
+          .introduce {
+            padding-left: 10rpx;
+            padding-bottom: 10rpx;
+            overflow: hidden; /*超出部分隐藏*/
+            white-space: nowrap; /*不换行*/
+            text-overflow: ellipsis; /*超出部分文字以...显示*/
+            width: 95%;
+            color: var(--remarksFontColor);
+            font-size: 20rpx;
+          }
           .price {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
             margin-left: 10rpx;
-            color: var(--nodeColor);
-            font-size: var(--priceSize);
+            color: var(--priceColor);
+            font-size: var(--smallFontSize);
             font-weight: bolder;
           }
         }

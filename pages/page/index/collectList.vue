@@ -109,7 +109,7 @@ export default {
         t.collectList = list;
       });
     },
-   
+
     toBuy(good_id) {
       console.log(good_id, "商品id");
       uni.navigateTo({
@@ -175,6 +175,11 @@ export default {
           /* -webkit-text-overflow: ellipsis; */
         }
         .goods_num {
+          display: block;
+          width: 100%;
+          overflow: hidden; /*超出部分隐藏*/
+          white-space: nowrap; /*不换行*/
+          text-overflow: ellipsis; /*超出部分文字以...显示*/
           color: #7a7e83;
           font-size: 22upx;
           height: 50rpx;

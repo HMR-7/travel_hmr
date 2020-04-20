@@ -1,5 +1,19 @@
 <template>
   <view class="content" v-if="goodDetail">
+    <van-popup
+      :show="closeCanvas"
+      @close="toCloseCanvas"
+      custom-style="margin:0;background-color:rgba(0,0,0,0);"
+    >
+      <view id="canvas-container" v-if="closeCanvas">
+        <canvas canvas-id="myCanvas" style="width:700rpx; height:450rpx"></canvas>
+      </view>
+      <button
+        v-show="posterPath"
+        style="margin-top:20rpx;background-color: var(--themeColor);color: #fff;"
+        @tap="saveImg"
+      >保存</button>
+    </van-popup>
     <!-- 轮播图 -->
     <swiper
       class="img-container"
@@ -16,7 +30,7 @@
             class="itemImg"
             :class="{active:currentIndex==index}"
             :src="item"
-            @tap="previewImage(item,index)"
+            @tap="previewImage(imgArr,item,index)"
           />
         </swiper-item>
       </block>
@@ -48,14 +62,14 @@
           style="
         color: #7a7e83;
         "
-        >所在地：暂无所在地信息</view>
+        >地址：暂无地址信息</view>
         <view
           class="place mar_bottom"
           v-if="goodDetail.address!=null"
           style="
         color: #7a7e83;
         "
-        >所在地：{{goodDetail.address}}</view>
+        >地址：{{goodDetail.address}}</view>
         <view
           class="place mar_bottom"
           v-if="goodDetail.good_price==undefined"
@@ -100,40 +114,109 @@
         </view>
         <view class="selMorePrice">详情可到景区售票处询问</view>
       </view>
-    </swiper-action> -->
+    </swiper-action>-->
     <!-- 门票信息 -->
     <view class="TicketMegs">
-        <view class="title">门票信息</view>
-        <!-- 门票价格 -->
-        <view class="TicketPrice">
-          <view class="PriceTitle">
-            成人票
-            <view
-              v-if="goodDetail.good_price==undefined"
-              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor); "
-            >￥--元/起</view>
-            <view
-              v-if="goodDetail.good_price!=undefined"
-              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor); "
-            >￥{{goodDetail.good_price}}元/起</view>
-          </view>
+      <view class="title">门票信息</view>
+      <!-- 门票价格 -->
+      <view class="TicketPrice">
+        <view class="PriceTitle">
+          成人票
+          <view
+            v-if="goodDetail.good_price==undefined"
+            style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
+          >￥--元/起</view>
+          <view
+            v-if="goodDetail.good_price!=undefined"
+            style="font-size:24rpx;font-weight:bolder;color: var(--priceColor); "
+          >￥{{goodDetail.good_price}}元/起</view>
         </view>
-        <view class="TicketPrice">
-          <view class="PriceTitle">
-            儿童票
-            <view
-              v-if="goodDetail.childTicket==undefined"
-              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
-            >￥--元/起</view>
-            <view
-              v-if="goodDetail.childTicket!=undefined"
-              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
-            >￥{{goodDetail.childTicket}}元/起</view>
-          </view>
-        </view>
-        <!-- 详情咨询提示 -->
-        <view class="selMorePrice">详情可到景区售票处询问</view>
       </view>
+      <view class="TicketPrice">
+        <view class="PriceTitle">
+          儿童票
+          <view
+            v-if="goodDetail.childTicket==undefined"
+            style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
+          >￥--元/起</view>
+          <view
+            v-if="goodDetail.childTicket!=undefined"
+            style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
+          >￥{{goodDetail.childTicket}}元/起</view>
+        </view>
+      </view>
+      <!-- 详情咨询提示 -->
+      <view class="selMorePrice">详情可到景区售票处询问</view>
+    </view>
+    <!-- 附近酒店信息 -->
+    <view class="TicketMegs">
+      <view class="title">附近酒店信息</view>
+      <!-- 门票价格 -->
+      <view class="TicketPrice" v-for="(item,index) in hotelList" :key="index">
+        <view class="PriceTitle" @tap="hotelDetail(item.id)">
+          <view v-if="item.hotel_name==undefined" style="font-size:32rpx;">--</view>
+          <view v-if="item.hotel_name!=undefined" style="font-size:32rpx;">{{item.hotel_name}}</view>
+          <view
+            v-if="item.hotel_price==null"
+            style="ffont-size:24rpx;font-weight:bolder;color: var(--priceColor);"
+          >{{item.hotel_price}}</view>
+          <view
+            v-if="item.hotel_price!=null"
+            style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
+          >¥{{item.hotel_price}}元/晚</view>
+          <!--   <view
+            v-if="item.hotel_name==undefined"
+            style="font-size:24rpx;font-weight:bolder;color: var(--priceColor); "
+          >--</view>
+          <view
+            v-if="item.hotel_name!=undefined"
+            style="font-size:24rpx;font-weight:bolder;color: var(--priceColor); "
+          >￥{{item.hotel_name}}元/起</view>-->
+        </view>
+      </view>
+      <!-- 详情咨询提示 -->
+    </view>
+    <van-popup :show="showHotelDetail" @close="showHotelDetail=false" @catchtouchmove="move">
+      <view class="handlehotelMegs" :key="index">
+        <swiper
+          class="img-container"
+          indicator-dots="true"
+          indicator-color="var(--detailColor)"
+          indicator-active-color="var(--themeColor)"
+          circular
+          autoplay
+        >
+          <block v-for="(item1, index1) in hotelDetailMegs.src" :key="index1">
+            <swiper-item class="item">
+              <image
+                class="itemImg"
+                :class="{active:currentIndex==index}"
+                :src="item1"
+                @tap="previewImage(hotelDetailMegs.src,item1,index)"
+              />
+            </swiper-item>
+          </block>
+        </swiper>
+        <view class="hotelName">{{hotelDetailMegs.hotel_name}}</view>
+        <view class="bottom">
+          <view class="hotelAddress">酒店地址：{{hotelDetailMegs.hotel_address}}</view>
+          <view
+            class="hotelPrice"
+            style="color:var(--priceColor)"
+          >¥{{hotelDetailMegs[0].hotel_price}}元/晚</view>
+        </view>
+        <view class="hotelPhone"></view>
+      </view>
+    </van-popup>
+    <!-- 分享好友、生成海报功能 -->
+    <view class="share">
+      <button hover-class="none" open-type="share" class="moudle" style="margin-right:20rpx">分享好友</button>
+      <view
+        @click="createPoster"
+        class="moudle"
+        style="background-color: var(--themeColor);color: #fff;border:none;"
+      >生成海报</view>
+    </view>
     <!-- 用户日志发布区域 -->
     <view class="travellog" v-if="log==1">
       <view class="title">旅游日志</view>
@@ -163,10 +246,22 @@ export default {
       good_id: "", //景点id
       good_name: "", //景点名称
       goodDetail: "", //商品详情
+      hotelList: [], //附近酒店列表
+      showHotelDetail: false, //获取用户点击的酒店详情
+      hotelDetailMegs: [], //酒店详情
       imgArr: "", //轮播图
       isCollect: "", //是否收藏
-      suggests: null //用户日志到发表内容
+      suggests: null, //用户日志到发表内容
+      posterPath: "",
+      closeCanvas: false, //是否显示海报
+      cardmg: "" //海报图片路径
     };
+  },
+  onPullDownRefresh() {
+    let t = this;
+    t.goodDetail = "";
+    t.getGoodDetail();
+    uni.stopPullDownRefresh;
   },
   created() {
     let t = this;
@@ -189,9 +284,9 @@ export default {
     } else {
       t.$utils.setAppTitile(options.name);
     }
-    // t.good_name = options.name;
     t.good_id = options.id;
     t.getGoodDetail();
+    t.getHotelList();
     t.intoFooterList();
   },
   methods: {
@@ -204,10 +299,44 @@ export default {
       };
       t.$utils.ajax(t.$api.getSwiper, "get", data, res => {
         console.log(res);
+        t.cardImg = res[0].src;
         t.goodDetail = res[0];
         t.imgArr = res[0].swipeArr;
         t.isCollect = res[1].iscollect;
       });
+    },
+    /* 获取景点关联的酒店列表 */
+    getHotelList() {
+      let t = this;
+      let data = {
+        good_id: t.good_id
+      };
+      t.$utils.ajax(t.$api.getHotelList, "get", data, res => {
+        console.log(res);
+        t.hotelList = res;
+        getApp().globalData.hotelList = res;
+        console.log(getApp().globalData.hotelList);
+      });
+    },
+    /* 获取用户查看的具体酒店信息 */
+    hotelDetail(id) {
+      let t = this,
+        hotelList = t.hotelList;
+      if (t.hotelDetailMegs) {
+        hotelList.some(v => {
+          if (v.id == id) {
+            let hotelimgArr = v.src.split(",");
+            v.src = hotelimgArr;
+            console.log(v, "vvvv");
+            t.hotelDetailMegs = v;
+            return v;
+          }
+        });
+      }
+      console.log(t.hotelDetailMegs, "酒店信息");
+      if (t.hotelDetailMegs) {
+        t.showHotelDetail = true;
+      }
     },
     /* 记录用户足迹 */
     intoFooterList() {
@@ -261,11 +390,11 @@ export default {
       });
     },
     /* 轮播图点击预览 */
-    previewImage(item,index) {
+    previewImage(arr, item, index) {
       let t = this,
-        imgSrc = t.imgArr;
+        imgSrc = arr;
       uni.previewImage({
-        current:index,
+        current: index,
         urls: imgSrc
       });
     },
@@ -306,7 +435,147 @@ export default {
         }, 1000);
       });
     },
-    /* 滑动事件 */
+    /* 生成海报 */
+    createPoster() {
+      let t = this;
+      t.closeCanvas = true;
+      t.getAvaterInfo(t.codeImg);
+    },
+    /* 下载图片 */
+    getAvaterInfo: function() {
+      uni.showLoading({
+        title: "生成中...",
+        mask: true
+      });
+      let t = this;
+      uni.downloadFile({
+        url: t.cardImg,
+        success: function(res) {
+          uni.hideLoading();
+          if (res.statusCode === 200) {
+            t.cardImg = res.tempFilePath;
+            t.getCanvas(t.cardImg, res.tempFilePath);
+          } else {
+            uni.showToast({
+              title: "未找到图片",
+              icon: "none",
+              duration: 2000
+              // success: function() {
+              //   t.cardImg = "";
+              //   t.getCanvas(t.cardImg, res.tempFilePath);
+              // }
+            });
+          }
+        }
+      });
+    },
+    /*用canvas绘制分享海报*/
+    getCanvas(cardImg, codeImg) {
+      let text = this.goodDetail.title;
+      var t = this;
+      uni
+        .createSelectorQuery()
+        .select("#canvas-container")
+        .boundingClientRect(function(rect) {
+          console.log(rect, "+++++++++++++++++++++++++++++++++++");
+          // let content = t.goodDetail.title;
+          let canvasWidth = rect.width;
+          let canvasHeight = rect.height;
+          // let textareaWidth = Math.ceil((canvasWidth - 40) / 16); //画布宽度除以字号
+          // console.log(textareaWidth, "textareaWidth");
+          const ctx = uni.createCanvasContext("myCanvas");
+          ctx.setFillStyle("#f6f9fe");
+          ctx.fillRect(0, 0, 350, 500);
+          // ctx.setFillStyle("#8e8e92");
+          ctx.setFillStyle("#8e8e92");
+          ctx.setFontSize(12);
+          ctx.setFillStyle("#000");
+          ctx.fillText(t.goodDetail.introduce, 0, 218);
+          ctx.setFillStyle("#fff"); // 文字颜色
+          if (cardImg) {
+            ctx.drawImage(cardImg, 0, 0, 350, 200);
+          }
+          ctx.draw(true, function() {
+            t.saveShareImg();
+          });
+        })
+        .exec();
+    },
+    /* 存入相册时设置的画布大小 */
+    saveShareImg: function() {
+      console.log(234234);
+      var t = this;
+      const ctx = uni.createCanvasContext("myCanvas");
+      console.log(ctx, "cyxx");
+      setTimeout(() => {
+        uni.canvasToTempFilePath(
+          {
+            width: 350,
+            height: 250,
+            destWidth: 350,
+            destHeight: 250,
+            canvasId: "myCanvas",
+            success: function(res) {
+              console.log(res, "生成了");
+              t.posterPath = res.tempFilePath;
+              console.log(t.posterPath, "t.posterPatht.posterPatht.posterPath");
+            },
+            fail: function(fail) {
+              console.log(fail, "失败");
+              t.$utils.showToast("生成失败");
+            },
+            complete: function(res) {
+              uni.hideLoading();
+            }
+          },
+          this
+        );
+      }, 1000);
+    },
+    /* 保存到相册按钮 */
+    saveImg() {
+      let t = this;
+      let tempFilePath = t.posterPath;
+      console.log(tempFilePath, "21212112");
+      uni.saveImageToPhotosAlbum({
+        filePath: tempFilePath,
+        success(res) {
+          console.info(res);
+          uni.showModal({
+            content: "图片已保存到相册，赶紧晒一下吧~",
+            showCancel: false,
+            confirmText: "好的",
+            confirmColor: "#333",
+            success: function(res) {
+              if (res.confirm) {
+              }
+            },
+            fail: function(res) {}
+          });
+        },
+        fail: function(res) {
+          console.log(res);
+          if (res.errMsg === "saveImageToPhotosAlbum:fail:auth denied") {
+            console.log("打开设置窗口");
+            uni.openSetting({
+              success(settingdata) {
+                console.log(settingdata);
+                if (settingdata.authSetting["scope.writePhotosAlbum"]) {
+                  console.log("获取权限成功，再次点击图片保存到相册");
+                } else {
+                  console.log("获取权限失败");
+                }
+              }
+            });
+          }
+        }
+      });
+    },
+    toCloseCanvas() {
+      let t = this;
+      if (t.closeCanvas) t.closeCanvas = !t.closeCanvas;
+    },
+    /* 滑动组件事件 */
     handleSwiperAction(e) {
       // 获取子组件传递的数据
       console.log(e);
@@ -322,6 +591,7 @@ export default {
   }
   width: 100%;
   min-height: 100vh;
+  padding-bottom: 150rpx;
   background-color: var(--contentBgc);
   .mar_bottom {
     margin-bottom: 20rpx;
@@ -382,7 +652,6 @@ export default {
       .price {
         width: 500rpx;
         color: #7a7e83;
-
         font-size: var(--smallFontSize);
         font-weight: bolder;
         padding-left: 20rpx;
@@ -405,6 +674,7 @@ export default {
   /* 门票信息 */
   .TicketMegs {
     margin: 0 20rpx;
+    margin-bottom: 20rpx;
     border-radius: 20rpx;
     background-color: #fff;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
@@ -435,6 +705,64 @@ export default {
       color: #00a2ff;
       font-size: 26rpx;
       text-align: center;
+    }
+  }
+  /*  用户点击的酒店信息 */
+  .handlehotelMegs {
+    display: flex;
+    flex-direction: column;
+    padding: 20rpx;
+    width: 650rpx;
+    .hotelName {
+      padding: 20rpx 0 20rpx 0;
+      font-size: var(--navFontSize);
+      font-weight: bolder;
+    }
+    .bottom {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      font-size: 24rpx;
+      .hotelAddress {
+        color: #7a7e83;
+        font-weight: bolder;
+        box-sizing: border-box;
+      }
+      .hotelPrice {
+        box-sizing: border-box;
+      }
+    }
+  }
+  /* 页面分享模块 */
+  .share {
+    position: fixed;
+    bottom: 0rpx;
+    padding-bottom: 20rpx;
+    display: flex;
+    flex-direction: row;
+    // justify-content: space-between;
+    padding: 0 20rpx;
+    width: 100%;
+    height: 150rpx;
+    background-color: #fff;
+    box-sizing: border-box;
+    button {
+      border: none !important;
+      border-radius: 0 !important;
+    }
+    button::after {
+      width: 0 !important;
+      height: 0 !important;
+      border: none !important;
+      border-radius: 0 !important;
+    }
+    .moudle {
+      flex: 1;
+      margin-top: 20rpx;
+      text-align: center;
+      border: 2rpx solid #f7f7f7;
+      height: 80rpx;
+      line-height: 80rpx;
     }
   }
   /* 旅游日志 */

@@ -30,6 +30,7 @@
 			"style": {
 				"navigationBarBackgroundColor": "#0ea391",
 				"navigationBarTextStyle": "white",
+				"enablePullDownRefresh": true,
 				"onReachBottomDistance": 50,
 				"usingComponents": {
 					"van-swipe-cell": "/wxcomponents/vant/dist/swipe-cell/index",

@@ -10,6 +10,9 @@ export default {
   },
   onHide: function() {
     console.log("App Hide");
+  },
+  globalData:{
+    hotelList:'6666'
   }
 };
 </script>

@@ -1,10 +1,6 @@
 <template>
   <view class="content">
-    <van-swipe-cell
-      v-for="(item,index) in collectList"
-      :key="index"
-      async-close
-    >
+    <van-swipe-cell v-for="(item,index) in collectList" :key="index" async-close>
       <van-cell-group>
         <van-cell class="a" title="单元格" value="内容">
           <view class="list_shop" @click="toBuy(item.id)">
@@ -94,8 +90,7 @@ export default {
         page: page,
         limit: 5
       };
-      t.$utils.ajax(t.$page.getFooterList
-      , "get", data, res => {
+      t.$utils.ajax(t.$page.getFooterList, "get", data, res => {
         t.goodsList = res;
         list = list.concat(res);
         console.log(list, "收藏商品列表");
@@ -175,6 +170,11 @@ export default {
           /* -webkit-text-overflow: ellipsis; */
         }
         .goods_num {
+          display: block;
+          width: 100%;
+          overflow: hidden; /*超出部分隐藏*/
+          white-space: nowrap; /*不换行*/
+          text-overflow: ellipsis; /*超出部分文字以...显示*/
           color: #7a7e83;
           font-size: 22upx;
           height: 50rpx;

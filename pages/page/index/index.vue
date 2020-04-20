@@ -9,7 +9,7 @@
             class="iconfont icon-sousuo"
             style="color:var(--detailColor);float:lef;line-height:54rpx; text-algin:center; margin-left:20rpx; font-size:36upx;width: 100%;"
           >
-            <text style="font-size:28rpx;padding-left:10rpx;">景区、美食、酒店</text>
+            <text style="font-size:28rpx;padding-left:10rpx;">请输入景区名称</text>
           </view>
           <span
             @tap="photoSearch"
