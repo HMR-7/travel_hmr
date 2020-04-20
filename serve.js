@@ -69,8 +69,6 @@ app.get("/userInfo", function (req, res) {
                 }
             })
         })
-
-
     } else {
         conn.query(sql, function (err, result) {
             let _res = JSON.stringify(result)
@@ -460,7 +458,6 @@ app.post("/userFooter", function (req, res) {
         if (!data.user_id) {
             return;
         }
-        // order by A desc,B   这个时候 A 降序，B 升序排列
         const selectsql = "select id from footer where user_id=" + data.user_id + " and good_id = " + data.good_id;
         conn.query(selectsql, function (err, result) {
             /* 去除RowData */
@@ -507,29 +504,9 @@ app.post("/userFooter", function (req, res) {
                     }
                 })
             }
-            // if (err) {
-            //     res.send({
-            //         msg: "足迹添加失败"
-            //     })
-            // } else {
-            //     res.send({
-            //         msg: "足迹添加成功"
-            //     })
-            // }
 
         })
-        // const insertsql = "insert into footer(user_id,good_id,time) values(?,?,?)"
-        // conn.query(insertsql, function (err, result) {
-        //     if (err) {
-        //         res.send({
-        //             msg: "足迹添加失败"
-        //         })
-        //     } else {
-        //         res.send({
-        //             msg: "足迹添加成功"
-        //         })
-        //     }
-        // })
+
     })
 })
 
@@ -574,7 +551,6 @@ app.get("/getFooterList", function (req, res) {
         }())
     })
 })
-
 app.listen(3000, () => {
     console.log('服务器已启动');
 
