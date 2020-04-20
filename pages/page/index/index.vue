@@ -324,7 +324,6 @@ export default {
     /* 推荐详情 */
     .list_shop {
       margin-top: 20rpx;
-      margin-left: 15rpx;
       /* position: relative; */
       background-color: #f8f8f8;
       .shop_details {
@@ -333,8 +332,8 @@ export default {
         justify-content: space-between;
         /* margin-bottom: 20rpx; */
         background-color: #fff;
-
         .goods_image {
+          padding-left: 20rpx;
           padding-top: 20rpx;
           width: 200rpx;
           height: 200rpx;
