@@ -559,8 +559,33 @@ app.get("/getHotelList", function (req, res) {
         let data = JSON.parse(_res)
         res.send(data)
     })
+})
+/* 美食推荐表 */
+app.get("/getFoodList", function (req, res) {
+    let reData = req.query;
+    let limit = Number(reData.page - 1) * Number(reData.limit);
+    const sql = "select * from food limit " + limit + "," + reData.limit
+    conn.query(sql, function (err, result) {
+        let _res = JSON.stringify(result)
+        let data = JSON.parse(_res)
+        res.send(data)
+    })
+})
+
+/* 获取用户日志模块列表 */
+app.get("/getTravelLog", function (req, res) {
+    let reData = req.query;
+    let limit = Number(reData.page - 1) * Number(reData.limit);
+    // const sql = "SELECT * FROM travellog limit " + limit + "," + reData.limit;
+    const sql = 'select * from travellog'
+    conn.query(sql, function (err, result) {
+        let _res = JSON.stringify(result)
+        let data = JSON.parse(_res)
+        res.send(data)
+    })
 
 })
+
 app.listen(3000, () => {
     console.log('服务器已启动');
 
