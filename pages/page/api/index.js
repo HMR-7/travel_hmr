@@ -1,7 +1,7 @@
 // /* 公司地址 */
-const http = 'http://192.168.88.121:3000/'
+// const http = 'http://192.168.88.121:3000/'
 /* 家用地址 */
-// const http = 'http://192.168.1.106:3000/'
+const http = 'http://192.168.1.106:3000/'
 
 const api = {
     userInfo: http + 'userInfo', //用户登录

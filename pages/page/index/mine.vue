@@ -87,27 +87,25 @@ export default {
     t.getListNum();
     uni.stopPullDownRefresh();
   },
-  created() {
-    let t = this,
-      userInfo = uni.getStorageSync("userInfo"),
-      sysInfo = uni.getStorageSync("sysInfo"),
-      user_id = uni.getStorageSync("UserId");
-    t.user_id = user_id;
-    let login = t.$utils.checkLogin();
-    if (!login) {
-      t.isLogin = false;
-      return;
-    } else {
-      t.isLogin = true;
-      t.userInfo = userInfo;
-      t.sysInfo = sysInfo;
-    }
-  },
   onShow() {
     let t = this;
     t.getListNum();
   },
-  onLoad() {},
+  onLoad() {
+    let t = this;
+      
+    let isLogin = uni.getStorageSync("UserId");
+    if (!isLogin) {
+      let login = t.$utils.checkLogin();
+    } else {
+      t.isLogin = true;
+      t.userInfo = uni.getStorageSync("userInfo"),
+      t.sysInfo = uni.getStorageSync("sysInfo"),
+      t.user_id = uni.getStorageSync("UserId");
+      // t.userInfo = userInfo;
+      // t.sysInfo = sysInfo;
+    }
+  },
   methods: {
     /* 获取收藏和足迹列表长度 */
     getListNum() {
@@ -131,9 +129,9 @@ export default {
       });
     },
     /* 获取用户足迹列表 */
-    toMyFootprint(){
+    toMyFootprint() {
       uni.navigateTo({
-         url: './myFootprint'
+        url: "./myFootprint"
       });
     },
     /* 拨打客服电话 */

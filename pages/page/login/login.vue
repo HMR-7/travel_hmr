@@ -167,9 +167,10 @@ export default {
               }, 1000);
               return;
             } else if (res.msg == false) {
+              let nickName = uni.getStorageSync('userInfo').nickName
               let data = {
                 openid: t.openid,
-                userName: t.userRes.nickName,
+                userName: nickName,
                 userPhone: t.userPhone
               };
               t.$utils.ajax(t.$api.insertuserInfo, "post", data, res => {

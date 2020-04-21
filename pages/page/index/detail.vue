@@ -232,8 +232,9 @@
       <view class="logTitle">
         <text class="iconfont icon-zuixin"></text>最新热评
       </view>
+      <view v-if="!traevlLength" style="background-color:#fff;text-align:center">赶紧来占个沙发吧！</view>
       <view class="logContent" v-for="(item,index) in traevlList" :key="index">
-        <view class="logContentHead">
+        <view v-if="traevlLength" class="logContentHead">
           <view class="userHeadImage">
             <image :src="item.user_head" mode="widthFix" />
           </view>
@@ -270,13 +271,16 @@
     <van-popup :show="writeLog" position="bottom" @close="writeLog=false">
       <view class="travellog" v-if="writeLog">
         <view class="title">旅游日志</view>
-        <textarea
-          class="sugs"
-          placeholder-style="padding-left:20rpx"
-          placeholder="请输入内容"
-          maxlength="-1"
-          @input="onInput"
-        ></textarea>
+        <view style="padding:0 20rpx">
+          <textarea
+            class="sugs"
+            cursor-spacing="100"
+            placeholder-style="padding-left:20rpx"
+            placeholder="请输入内容"
+            maxlength="-1"
+            @input="onInput"
+          ></textarea>
+        </view>
         <view class="sumbit" @tap="confirm">提交</view>
       </view>
     </van-popup>
@@ -307,7 +311,7 @@ export default {
       hotelDetailMegs: [], //酒店详情
       foodList: [], //获取美食推荐列表
       traevlList: [], //获取旅游日志列表
-      traevlLength: "", //日志总条数
+      traevlLength: null, //日志总条数
       imgArr: "", //轮播图
       isCollect: "", //是否收藏
       suggests: null, //用户日志到发表内容
@@ -479,7 +483,11 @@ export default {
         good_id: t.good_id
       };
       t.$utils.ajax(t.$api.getTravelLog, "get", data, res => {
-        console.log(res.log, "旅游日志");
+        console.log(res, "旅游日志后端返回值");
+        t.traevlLength = res.length;
+        console.log(res.length);
+        
+        console.log(res.log, "旅游日志数组");
         res.log.map(v => {
           v.time = moment(v.time).format("YYYY-M-DD HH:mm:ss");
           console.log(v.time, "相对时间");
@@ -598,13 +606,15 @@ export default {
       };
       t.$utils.ajax(t.$page.submitFeedback, "post", data, res => {
         console.log(res);
-        t.$utils.showToast("发布成功，即将跳转到首页");
+        t.$utils.showToast("点评成功！");
         setTimeout(() => {
+          t.traevlList = [];
+          t.getTravelLog();
+          t.writeLog = false;
           console.log(1111);
-
-          uni.switchTab({
-            url: "./index"
-          });
+          // uni.switchTab({
+          //   url: "./index"
+          // });
         }, 1000);
       });
     },
@@ -1041,7 +1051,9 @@ export default {
     .sugs {
       margin-bottom: 40rpx;
       width: 100%;
-      background-color: #fff;
+      background-color: #f5f6fa;
+      padding: 20rpx;
+      box-sizing: border-box;
       border-bottom: 2rpx solid #ededed;
     }
     .imgUp {

@@ -283,7 +283,9 @@ const utils = {
     })
   },
   checkLogin(fn) {
-    let us = uni.getStorageSync('userInfo')
+    // let us = uni.getStorageSync('userInfo')
+    let us = uni.getStorageSync('UserId');
+    
     // if(us){
     //   if(us.login_pay==0&&us.is_login_pay==1){
     //     uni.redirectTo({
