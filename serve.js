@@ -116,6 +116,10 @@ app.post('/insertuserInfo', function (req, res) {
     })
     req.on('end', function () {
         data = JSON.parse(data)
+        if (!data.openid) {
+            res.send('无openid，禁止登录')
+            return
+        }
         console.log(data, '用户注册post请求接受前端传递的参数');
         const insertsql = 'insert into userinfo(nickName,userPhone,openid) values(?,?,?)';
         conn.query(insertsql, [data.userName, data.userPhone, data.openid], function (err) {
