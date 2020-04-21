@@ -116,7 +116,7 @@ app.post('/insertuserInfo', function (req, res) {
     })
     req.on('end', function () {
         data = JSON.parse(data)
-        console.log(data, 'post请求接受前端传递的参数');
+        console.log(data, '用户注册post请求接受前端传递的参数');
         const insertsql = 'insert into userinfo(nickName,userPhone,openid) values(?,?,?)';
         conn.query(insertsql, [data.userName, data.userPhone, data.openid], function (err) {
             if (err) {
@@ -277,8 +277,10 @@ app.post("/submitFeedback", function (req, res) {
     req.on('end', function () {
         data = JSON.parse(data)
         console.log(data, 'post请求接受前端传递的参数');
-        const insertsql = 'insert into travellog(good_id,user_id,user_head,user_name,article) values(?,?,?,?,?)';
-        conn.query(insertsql, [data.good_id, data.user_id, data.user_head, data.user_name, data.article], function (err) {
+        let nowtime = new Date().getTime();
+
+        const insertsql = 'insert into travellog(good_id,user_id,user_head,user_name,article,time) values(?,?,?,?,?,?)';
+        conn.query(insertsql, [data.good_id, data.user_id, data.user_head, data.user_name, data.article, nowtime], function (err) {
             if (err) {
                 console.log(err);
                 res.send({
@@ -575,13 +577,23 @@ app.get("/getFoodList", function (req, res) {
 /* 获取用户日志模块列表 */
 app.get("/getTravelLog", function (req, res) {
     let reData = req.query;
+    console.log(reData, '获取日志参数');
     let limit = Number(reData.page - 1) * Number(reData.limit);
-    // const sql = "SELECT * FROM travellog limit " + limit + "," + reData.limit;
-    const sql = 'select * from travellog'
+    const sql = "SELECT * FROM travellog where good_id=" + reData.good_id + " order by time desc  limit " + limit + "," + reData.limit + ""
+    // const sql = "select * from travellog order by time desc"
+    var allobj = {}
     conn.query(sql, function (err, result) {
         let _res = JSON.stringify(result)
         let data = JSON.parse(_res)
-        res.send(data)
+        allobj.log = data;
+        // res.send(data)
+    })
+    const selAllLogsql = "SELECT * FROM travellog where good_id=" + reData.good_id
+    conn.query(selAllLogsql, function (err, result) {
+        let _res = JSON.stringify(result)
+        let data = JSON.parse(_res)
+        allobj.length = data.length;
+        res.send(allobj)
     })
 
 })
