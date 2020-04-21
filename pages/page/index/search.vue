@@ -126,8 +126,6 @@ export default {
     /* 搜素按钮 */
     toStart(searchKey) {
       let t = this;
-      console.log(typeof searchKey);
-
       console.log(t.timeId, "timeId");
 
       if (t.log == 1) {
@@ -151,8 +149,6 @@ export default {
           t.$utils.showToast("请输入景点名");
           return;
         } else {
-          console.log(searchKey,'searchKey');
-          
           uni.navigateTo({
             url: "./searchRerult?keyword=" + searchKey
           });
@@ -232,7 +228,6 @@ export default {
       !isExist && history.push(_searchKey);
       uni.setStorageSync("history", history);
       this.history = uni.getStorageSync("history") || [];
-      
     },
     /* 清除历史记录 */
     clearHistory() {
@@ -267,10 +262,16 @@ export default {
       t.isThinkArea = false;
     },
     /* 用户写日志时前往对商品详情表 */
-    toDetail(good_id,good_name) {
+    toDetail(good_id, good_name) {
       let t = this;
       uni.navigateTo({
-        url: "./detail?log=" + t.log + "&&id=" + good_id +"&&good_name=" +good_name
+        url:
+          "./detail?log=" +
+          t.log +
+          "&&id=" +
+          good_id +
+          "&&good_name=" +
+          good_name
       });
     }
   }
@@ -361,12 +362,10 @@ export default {
       flex-wrap: wrap;
       border-radius: 20rpx;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-
       .goods {
         width: 100%;
         height: 100%;
         font-size: 28upx;
-
         .top {
           width: 100%;
           border-radius: 15rpx;
@@ -375,7 +374,7 @@ export default {
           /* 轮播图 */
           .img-container {
             overflow: hidden;
-            transform: translateY(0);
+            transform: translateY(0); //解决轮播图转化border-radius复位问题
             height: 400rpx;
             width: 100%;
             background-color: #fff;

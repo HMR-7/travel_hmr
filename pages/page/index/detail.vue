@@ -1,6 +1,5 @@
 <template>
   <view class="content" v-if="goodDetail">
-    
     <van-popup
       :show="closeCanvas"
       @close="toCloseCanvas"
@@ -55,6 +54,10 @@
       </view>
       <view class="middle">
         <view class="price mar_bottom">{{goodDetail.introduce}}</view>
+        <view style="color:#00a2ff; font-size:28rpx;" @tap="log=!log">
+          {{traevlLength}}条点评
+          <text style="color:#00a2ff;font-size:24rpx" class="iconfont icon-arrowRight"></text>
+        </view>
       </view>
       <view class="bottom">
         <view
@@ -117,112 +120,138 @@
         <view class="selMorePrice">详情可到景区售票处询问</view>
       </view>
     </swiper-action>-->
-    <!-- 门票信息 -->
-    <view class="TicketMegs">
-      <view class="title">门票信息</view>
-      <!-- 门票价格 -->
-      <view class="TicketPrice">
-        <view class="PriceTitle">
-          成人票
-          <view
-            v-if="goodDetail.good_price==undefined"
-            style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
-          >￥--元/起</view>
-          <view
-            v-if="goodDetail.good_price!=undefined"
-            style="font-size:24rpx;font-weight:bolder;color: var(--priceColor); "
-          >￥{{goodDetail.good_price}}元/起</view>
+    <view v-if="!log">
+      <!-- 门票信息 -->
+      <view class="TicketMegs">
+        <view class="title">门票信息</view>
+        <!-- 门票价格 -->
+        <view class="TicketPrice">
+          <view class="PriceTitle">
+            成人票
+            <view
+              v-if="goodDetail.good_price==undefined"
+              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
+            >￥--元/起</view>
+            <view
+              v-if="goodDetail.good_price!=undefined"
+              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor); "
+            >￥{{goodDetail.good_price}}元/起</view>
+          </view>
         </view>
+        <view class="TicketPrice">
+          <view class="PriceTitle">
+            儿童票
+            <view
+              v-if="goodDetail.childTicket==undefined"
+              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
+            >￥--元/起</view>
+            <view
+              v-if="goodDetail.childTicket!=undefined"
+              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
+            >￥{{goodDetail.childTicket}}元/起</view>
+          </view>
+        </view>
+        <!-- 详情咨询提示 -->
+        <view class="selMorePrice">详情可到景区售票处询问</view>
       </view>
-      <view class="TicketPrice">
-        <view class="PriceTitle">
-          儿童票
-          <view
-            v-if="goodDetail.childTicket==undefined"
-            style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
-          >￥--元/起</view>
-          <view
-            v-if="goodDetail.childTicket!=undefined"
-            style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
-          >￥{{goodDetail.childTicket}}元/起</view>
-        </view>
+      <!-- 美食推荐列表 -->
+      <view
+        style="margin:20rpx;border-radius: 20rpx;overflow: hidden;box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);"
+      >
+        <view class="scrollTitle">蓬莱美食推荐</view>
+        <scroll-view class="foodScroll" scroll-y="true" @scrolltolower="refrechFoodList">
+          <view v-for="(item,index) in foodList" :key="index">
+            <view class="foodTitle">{{item.food_name}}</view>
+          </view>
+        </scroll-view>
       </view>
-      <!-- 详情咨询提示 -->
-      <view class="selMorePrice">详情可到景区售票处询问</view>
-    </view>
-    <!-- 美食推荐列表 -->
-    <view
-      style="margin:20rpx;border-radius: 20rpx;overflow: hidden;box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);"
-    >
-      <view class="scrollTitle">蓬莱美食推荐</view>
-      <scroll-view class="foodScroll" scroll-y="true" @scrolltolower="refrechFoodList">
-        <view v-for="(item,index) in foodList" :key="index">
-          <view class="foodTitle">{{item.food_name}}</view>
-        </view>
-      </scroll-view>
-    </view>
-    <!-- 附近酒店信息 -->
-    <view class="TicketMegs">
-      <view class="title">附近酒店信息</view>
-      <view class="TicketPrice" v-if="hotelList.length==0" style="text-align:center;">暂无可推荐酒店</view>
+      <!-- 附近酒店信息 -->
+      <view class="TicketMegs">
+        <view class="title">附近酒店信息</view>
+        <view class="TicketPrice" v-if="hotelList.length==0" style="text-align:center;">暂无可推荐酒店</view>
 
-      <!-- 酒店信息价格 -->
-      <view class="TicketPrice" v-for="(item,index) in hotelList" :key="index">
-        <view class="PriceTitle" @tap="hotelDetail(item.id)">
-          <view v-if="item.hotel_name==undefined" style="font-size:32rpx;">--</view>
-          <view v-if="item.hotel_name!=undefined" style="font-size:32rpx;">{{item.hotel_name}}</view>
-          <view
-            v-if="item.hotel_price==null"
-            style="ffont-size:24rpx;font-weight:bolder;color: var(--priceColor);"
-          >{{item.hotel_price}}</view>
-          <view
-            v-if="item.hotel_price!=null"
-            style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
-          >¥{{item.hotel_price}}元/起</view>
-          <!--   <view
+        <!-- 酒店信息价格 -->
+        <view class="TicketPrice" v-for="(item,index) in hotelList" :key="index">
+          <view class="PriceTitle" @tap="hotelDetail(item.id)">
+            <view v-if="item.hotel_name==undefined" style="font-size:32rpx;">--</view>
+            <view v-if="item.hotel_name!=undefined" style="font-size:32rpx;">{{item.hotel_name}}</view>
+            <view
+              v-if="item.hotel_price==null"
+              style="ffont-size:24rpx;font-weight:bolder;color: var(--priceColor);"
+            >{{item.hotel_price}}</view>
+            <view
+              v-if="item.hotel_price!=null"
+              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
+            >¥{{item.hotel_price}}元/起</view>
+            <!--   <view
             v-if="item.hotel_name==undefined"
             style="font-size:24rpx;font-weight:bolder;color: var(--priceColor); "
           >--</view>
           <view
             v-if="item.hotel_name!=undefined"
             style="font-size:24rpx;font-weight:bolder;color: var(--priceColor); "
-          >￥{{item.hotel_name}}元/起</view>-->
+            >￥{{item.hotel_name}}元/起</view>-->
+          </view>
         </view>
+        <!-- 详情咨询提示 -->
       </view>
-      <!-- 详情咨询提示 -->
+      <van-popup :show="showHotelDetail" @close="showHotelDetail=false" @catchtouchmove="move">
+        <view class="handlehotelMegs" :key="index">
+          <swiper
+            class="img-container"
+            indicator-dots="true"
+            indicator-color="var(--detailColor)"
+            indicator-active-color="var(--themeColor)"
+            circular
+            autoplay
+          >
+            <block v-for="(item1, index1) in hotelDetailMegs.src" :key="index1">
+              <swiper-item class="item">
+                <image
+                  class="itemImg"
+                  :class="{active:currentIndex==index}"
+                  :src="item1"
+                  @tap="previewImage(hotelDetailMegs.src,item1,index)"
+                />
+              </swiper-item>
+            </block>
+          </swiper>
+          <view class="hotelName">{{hotelDetailMegs.hotel_name}}</view>
+          <view class="bottom">
+            <view class="hotelAddress">酒店地址：{{hotelDetailMegs.hotel_address}}</view>
+            <view
+              class="hotelPrice"
+              style="color:var(--priceColor)"
+            >¥{{hotelDetailMegs.hotel_price}}元/起</view>
+          </view>
+          <view class="hotelPhone"></view>
+        </view>
+      </van-popup>
     </view>
-    <van-popup :show="showHotelDetail" @close="showHotelDetail=false" @catchtouchmove="move">
-      <view class="handlehotelMegs" :key="index">
-        <swiper
-          class="img-container"
-          indicator-dots="true"
-          indicator-color="var(--detailColor)"
-          indicator-active-color="var(--themeColor)"
-          circular
-          autoplay
-        >
-          <block v-for="(item1, index1) in hotelDetailMegs.src" :key="index1">
-            <swiper-item class="item">
-              <image
-                class="itemImg"
-                :class="{active:currentIndex==index}"
-                :src="item1"
-                @tap="previewImage(hotelDetailMegs.src,item1,index)"
-              />
-            </swiper-item>
-          </block>
-        </swiper>
-        <view class="hotelName">{{hotelDetailMegs.hotel_name}}</view>
-        <view class="bottom">
-          <view class="hotelAddress">酒店地址：{{hotelDetailMegs.hotel_address}}</view>
-          <view
-            class="hotelPrice"
-            style="color:var(--priceColor)"
-          >¥{{hotelDetailMegs.hotel_price}}元/起</view>
-        </view>
-        <view class="hotelPhone"></view>
+    <view v-if="log" :class="log?'animated fadeIn':''">
+      <view class="logTitle">
+        <text class="iconfont icon-zuixin"></text>最新热评
       </view>
-    </van-popup>
+      <view class="logContent" v-for="(item,index) in traevlList" :key="index">
+        <view class="logContentHead">
+          <view class="userHeadImage">
+            <image :src="item.user_head" mode="widthFix" />
+          </view>
+          <view class="userMegs">
+            <view>{{item.user_name}}</view>
+            <view style="color:#7a7e83;font-size:18rpx">
+              {{item.time}}
+              <text style="font-size:20rpx">发表</text>
+            </view>
+          </view>
+        </view>
+        <scroll-view scroll-y="true" class="logContentNav">
+          <view>{{item.article}}</view>
+        </scroll-view>
+        <!-- <view class="logContentNav">
+        </view>-->
+      </view>
+    </view>
     <!-- 分享好友、生成海报功能 -->
     <view class="share">
       <button hover-class="none" open-type="share" class="moudle" style="margin-right:20rpx">分享好友</button>
@@ -256,16 +285,19 @@
 
 <script>
 import { swiperAction } from "@/components/swiperAction";
+import moment from "moment";
+moment.locale("zh-cn");
 export default {
   components: {
     swiperAction
   },
   data() {
     return {
+      islogOpen: false,
       page: 1, //食物列表的页数
       isCollect: "", //是否被用户收藏
-      writeLog:false,//是否显示日志页面
-      log: 0, //判断是否是日志发布
+      writeLog: false, //是否显示日志页面
+      log: 0, //判断是否显示日志
       user_id: "", //用户id
       good_id: "", //景点id
       good_name: "", //景点名称
@@ -274,6 +306,8 @@ export default {
       showHotelDetail: false, //获取用户点击的酒店详情
       hotelDetailMegs: [], //酒店详情
       foodList: [], //获取美食推荐列表
+      traevlList: [], //获取旅游日志列表
+      traevlLength: "", //日志总条数
       imgArr: "", //轮播图
       isCollect: "", //是否收藏
       suggests: null, //用户日志到发表内容
@@ -291,7 +325,24 @@ export default {
     t.getGoodDetail();
     t.getHotelList();
     t.getFoodList();
+    if (t.log) {
+      t.traevlList = [];
+      t.getTravelLog();
+    }
     uni.stopPullDownRefresh();
+  },
+  /* 触底判断加载下一页 */
+  onReachBottom(options) {
+    let t = this,
+      traevlList = t.traevlList;
+    /* 判断是否加载下一页 */
+    if (traevlList.length < 5) {
+      console.log(111);
+      return;
+    } else if (traevlList.length >= 5) {
+      t.page++;
+      t.getTravelLog();
+    }
   },
   created() {
     let t = this;
@@ -303,6 +354,7 @@ export default {
   },
   onLoad(options) {
     let t = this;
+
     console.log(options);
     if (!options.log) {
     } else if (options.log == 1) {
@@ -319,7 +371,12 @@ export default {
     t.getHotelList();
     t.intoFooterList();
     t.getFoodList();
+    t.getTravelLog();
   },
+  mounted() {
+    let t = this;
+  },
+
   methods: {
     /* 获取商品详情 */
     getGoodDetail() {
@@ -410,6 +467,49 @@ export default {
         t.page++;
         t.getFoodList();
       }
+    },
+    /* 获取旅游日志推荐表 */
+    getTravelLog() {
+      let t = this,
+        list = t.traevlList,
+        page = t.page;
+      let data = {
+        page: t.page,
+        limit: 5,
+        good_id: t.good_id
+      };
+      t.$utils.ajax(t.$api.getTravelLog, "get", data, res => {
+        console.log(res.log, "旅游日志");
+        res.log.map(v => {
+          v.time = moment(v.time).format("YYYY-M-DD HH:mm:ss");
+          console.log(v.time, "相对时间");
+          return v;
+        });
+        /* 数组拼接 */
+        if (t.log) {
+          list = list.concat(res.log);
+          console.log(list, "旅游日志列表");
+          if (list.length == 0 && t.page == 1) {
+            console.log(111);
+          }
+          if (res.log.length == 0 && t.page > 1) {
+            uni.showToast({
+              title: "没有更多了",
+              icon: "none",
+              duration: 2000,
+              success: () => {
+                t.page--;
+              }
+            });
+          } else {
+          }
+          t.traevlList = list;
+          return;
+          console.log(t.traevlList, "map之后的旅游日志");
+        }
+        t.traevlList = res.log;
+        t.traevlLength = res.length;
+      });
     },
     /* 记录用户足迹 */
     intoFooterList() {
@@ -721,13 +821,17 @@ export default {
       }
     }
     .middle {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      padding: 0 20rpx;
       width: 100%;
+      box-sizing: border-box;
       .price {
         width: 500rpx;
         color: #7a7e83;
         font-size: var(--smallFontSize);
         font-weight: bolder;
-        padding-left: 20rpx;
         box-sizing: border-box;
       }
     }
@@ -778,6 +882,7 @@ export default {
       color: #00a2ff;
       font-size: 26rpx;
       text-align: center;
+      display: inline-block;
     }
   }
   /*  用户点击的酒店信息 */
@@ -816,6 +921,7 @@ export default {
     border-bottom: 2rpx solid #ededed;
     background-color: #fff;
   }
+  /* 美食列表scroll标签 */
   .foodScroll {
     height: 300rpx;
     background-color: #fff;
@@ -830,8 +936,64 @@ export default {
       border-bottom: 2rpx solid #ededed;
     }
   }
+  /* 旅游日志列表-区域标题 */
+
+  .logTitle {
+    padding: 10rpx;
+    font-size: 28rpx;
+    height: 50rpx;
+    line-height: 50rpx;
+    background-color: #fff;
+    .iconfont {
+      padding-right: 10rpx;
+      color: var(--themeColor);
+      font-size: 36rpx !important;
+    }
+  }
+  .logContent {
+    border-bottom: 4rpx solid #f8f8f8;
+    background-color: #fff;
+    .logContentHead {
+      display: flex;
+      flex-direction: row;
+      .userHeadImage {
+        padding-top: 10rpx;
+        padding-left: 20rpx;
+
+        image {
+          width: 100rpx;
+          height: 100rpx;
+          border-radius: 100%;
+        }
+      }
+      .userMegs {
+        margin: auto 0;
+        padding-left: 20rpx;
+      }
+    }
+    .logContentNav {
+      padding-left: 140rpx;
+      max-height: 160rpx;
+      color: #292c32;
+      font-size: 28rpx;
+    }
+    .openTag {
+      position: absolute;
+      bottom: 0rpx;
+      right: 5rpx;
+      color: #00a2ff;
+      box-shadow: -30rpx 0rpx 10rpx rgba(255, 255, 255, 0.8);
+      background-color: rgb(255, 255, 255);
+    }
+    .open {
+      position: relative;
+      padding-left: 100rpx;
+      font-size: 28rpx;
+    }
+  }
   /* 页面分享模块 */
   .share {
+    z-index: 100;
     position: fixed;
     bottom: 0rpx;
     padding-bottom: 20rpx;
@@ -865,7 +1027,7 @@ export default {
   /* 旅游日志 */
   /* 日志发表区域 */
   .travellog {
-    margin-bottom :20rpx;
+    margin-bottom: 20rpx;
     .title {
       padding: 30rpx 0 20rpx 20rpx;
       color: var(--themeColor);

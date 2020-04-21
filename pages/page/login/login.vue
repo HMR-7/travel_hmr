@@ -58,7 +58,6 @@
 export default {
   data() {
     return {
-      userInfo: "",
       openid: "", //用户openId
       userPhone: "", //用户手机号
       userName: "", //用户名
@@ -170,8 +169,8 @@ export default {
             } else if (res.msg == false) {
               let data = {
                 openid: t.openid,
-                userName: t.userInfo.nickName,
-                userPhone: t.sysInfo.phone
+                userName: t.userRes.nickName,
+                userPhone: t.userPhone
               };
               t.$utils.ajax(t.$api.insertuserInfo, "post", data, res => {
                 console.log(res, "999999999");
