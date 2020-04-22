@@ -1,7 +1,8 @@
 // /* 公司地址 */
 // const http = 'http://192.168.88.121:3000/'
+// const http = 'https://120.53.93.29:3000/'
 /* 家用地址 */
-const http = 'http://192.168.1.106:3000/'
+const http = 'https://hmr.nbxinyitec.com/'
 
 const api = {
     userInfo: http + 'userInfo', //用户登录
