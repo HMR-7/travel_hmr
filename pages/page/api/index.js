@@ -18,8 +18,10 @@ const api = {
     getCollectList: http + 'getCollectList', //查看用户收藏列表详情
     getFooterList: http + 'getFooterList', //查看用户足迹列表详情
     getHotelList: http + 'getHotelList', //获取景点到酒店推荐
-    getFoodList : http + 'getFoodList' ,//获取本地美食推荐
-    getTravelLog : http + 'getTravelLog' //获取旅游日志
+    getFoodList: http + 'getFoodList', //获取本地美食推荐
+    getTravelLog: http + 'getTravelLog', //获取旅游日志
+    isAdminCheck: http + 'isAdminCheck', //管理员查询
+    addFoodMegs :http + 'addFoodMegs' //管理员添加食物信息
 }
 
 export default api

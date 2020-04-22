@@ -1,6 +1,17 @@
 {
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
+			"path": "pages/page/index/index",
+			"style": {
+				"navigationBarTitleText": "主页",
+				"navigationBarBackgroundColor": "#0ea391",
+				"navigationBarTextStyle": "white",
+				"enablePullDownRefresh": true,
+				"onReachBottomDistance": 50,
+				"usingComponents": {}
+			}
+		},
+		{
 			"path": "pages/page/login/login",
 			"style": {
 				"navigationBarTitleText": "用户登录",
@@ -12,17 +23,6 @@
 					"van-field": "/wxcomponents/vant/dist/field/index",
 					"van-count-down": "/wxcomponents/vant/dist/count-down/index"
 				}
-			}
-		},
-		{
-			"path": "pages/page/index/index",
-			"style": {
-				"navigationBarTitleText": "主页",
-				"navigationBarBackgroundColor": "#0ea391",
-				"navigationBarTextStyle": "white",
-				"enablePullDownRefresh": true,
-				"onReachBottomDistance": 50,
-				"usingComponents": {}
 			}
 		},
 		{
@@ -91,7 +91,7 @@
 				"enablePullDownRefresh": true,
 				"onReachBottomDistance": 50,
 				"usingComponents": {
-					"van-swipe-cell":"/wxcomponents/vant/dist/swipe-cell/index"
+					"van-swipe-cell": "/wxcomponents/vant/dist/swipe-cell/index"
 				}
 			}
 		},
@@ -118,8 +118,18 @@
 				},
 				"navigationBarTitleText": "我的足迹"
 			}
+		}, {
+			"path": "pages/page/index/admin",
+			"style": {
+				"navigationBarBackgroundColor": "#0ea391",
+				"navigationBarTextStyle": "white",
+				"usingComponents": {
+					"van-popup": "/wxcomponents/vant/dist/popup/index"
+				},
+				"navigationBarTitleText": "管理中心"
+			}
 		},
-		
+
 
 		{
 			"path": "pages/page/index/test",

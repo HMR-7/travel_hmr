@@ -152,6 +152,7 @@ export default {
           t.$utils.ajax(t.$api.userInfo, "get", data, res => {
             console.log(res, "用户表信息");
             uni.setStorageSync("UserId", res.id);
+            uni.setStorageSync("isAdmin", res.isAdmin);
             let listLength = {};
             listLength.CollectList = res.CollectList;
             listLength.FooterList = res.FooterList;

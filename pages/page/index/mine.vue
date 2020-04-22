@@ -24,6 +24,11 @@
         <view class="number" v-if="user_id!=null">{{listNum.CollectList}}</view>
         <view class="caption">我的收藏</view>
       </view>
+      <!-- 是否未管理员 -->
+      <view class="action_line" v-if="isAdmin" @tap="toAdmin">
+        <view style="font-size:48rpx" class="number iconfont icon-houtaiguanli"></view>
+        <view class="caption">后台管理</view>
+      </view>
       <!-- 我的足迹 -->
       <view class="action_line" @tap="toMyFootprint">
         <view class="number" v-if="listNum.CollectList==null">0</view>
@@ -61,6 +66,7 @@
 export default {
   data() {
     return {
+      isAdmin: null,
       user_id: "", //用户id
       userInfo: "", //用户信息
       listNum: "", //用户已收藏、足迹列表数量
@@ -93,15 +99,15 @@ export default {
   },
   onLoad() {
     let t = this;
-      
     let isLogin = uni.getStorageSync("UserId");
+    t.isAdmin = uni.getStorageSync("isAdmin");
     if (!isLogin) {
       let login = t.$utils.checkLogin();
     } else {
       t.isLogin = true;
-      t.userInfo = uni.getStorageSync("userInfo"),
-      t.sysInfo = uni.getStorageSync("sysInfo"),
-      t.user_id = uni.getStorageSync("UserId");
+      (t.userInfo = uni.getStorageSync("userInfo")),
+        (t.sysInfo = uni.getStorageSync("sysInfo")),
+        (t.user_id = uni.getStorageSync("UserId"));
       // t.userInfo = userInfo;
       // t.sysInfo = sysInfo;
     }
@@ -157,7 +163,12 @@ export default {
       uni.navigateTo({
         url: "./search?log=1"
       });
-    }
+    },
+    toAdmin(){
+      uni.navigateTo({
+         url: './admin'
+      });
+   }
   }
 };
 </script>

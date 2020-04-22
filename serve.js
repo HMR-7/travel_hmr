@@ -39,7 +39,7 @@ var conn = mysql.createConnection({
 app.get("/userInfo", function (req, res) {
     let Sqldata = req.query;
     console.log(req.query, '用户登录get请求前端传递到后端的参数')
-    const sql = "SELECT openid,id FROM userinfo where openid = '" + Sqldata.openid + "'"
+    const sql = "SELECT openid,id,isAdmin FROM userinfo where openid = '" + Sqldata.openid + "'"
     if (Sqldata.id) {
         const sql = "SELECT openid,id FROM userinfo where id = '" + Sqldata.id + "'"
         conn.query(sql, function (err, result) {
@@ -49,7 +49,6 @@ app.get("/userInfo", function (req, res) {
                 if ((value.openid == Sqldata.openid) || (value.id == Sqldata.id)) {
                     const selcollectsql = "select iscollect from collect where user_id =" + value.id + " and iscollect = 1"
                     console.log(selcollectsql, 'selcollectsqlselcollectsqlselcollectsqlselcollectsql');
-
                     conn.query(selcollectsql, function (err, result) {
                         let _res = JSON.stringify(result);
                         let data = JSON.parse(_res);
@@ -302,7 +301,6 @@ app.post("/submitFeedback", function (req, res) {
     })
 
 })
-
 /* 写日志时，搜索按钮的点击事件查询 */
 app.get("/getSearchResult", function (req, res) {
     let Sqldata = req.query;
@@ -602,6 +600,92 @@ app.get("/getTravelLog", function (req, res) {
 
 })
 
+/* 管理员查询 */
+app.get("/isAdminCheck", function (req, res) {
+    let reData = req.query;
+    console.log(reData, '管理员查询')
+    if (reData.isAdmin != 1) {
+        return;
+    }
+    var allArr = [];
+    var checkId = 0;
+    // var sql = "select * from userinfo";
+    (function run() {
+        switch (checkId) {
+            case 0:
+                var sql = "select * from userinfo";
+                break;
+            case 1:
+                var sql = "select * from travellog";
+                break;
+            case 2:
+                var sql = "select * from detail";
+                break;
+            case 3:
+                var sql = "select * from hotel";
+                break;
+            case 4:
+                var sql = "select * from food";
+                break;
+            default:
+                break;
+        }
+        conn.query(sql, function (err, result) {
+            let _res = JSON.stringify(result)
+            let data = JSON.parse(_res)
+            allArr.push(data);
+
+            if (checkId < 5) {
+                checkId++;
+                console.log(checkId, "checkId");
+                if (checkId == 5) {
+                    console.log(allArr, "全部内容");
+                    res.send(allArr)
+                    return allArr;
+                }
+                run();
+            }
+            /* let allobj = {}
+            allobj.detailArr = data;
+            allobj.length = data.length;
+            res.send(allobj) */
+        })
+    }())
+
+})
+/* 管理员添加美食推荐内容 */
+app.post("/addFoodMegs", function (req, res) {
+    var data = "";
+    req.on('data', function (chunk) {
+        data += chunk;
+    })
+    req.on('end', function () {
+        data = JSON.parse(data)
+        if (!data.food_name || !data.food_address) {
+            res.send('未填写食物信息')
+            return
+        }
+        console.log(data, '管理员插入新食物信息post请求接受前端传递的参数');
+        const insertsql = 'insert into food(food_name,food_address) values(?,?)';
+        conn.query(insertsql, [data.food_name, data.food_address], function (err) {
+            if (err) {
+                console.log(err);
+                res.send({
+                    msg: "添加失败!!",
+                    flag: 'no'
+                });
+            } else {
+                res.send({
+                    msg: "添加成功!!",
+                    flag: 'yes'
+                });
+
+            }
+        })
+        return
+    })
+
+})
 app.listen(10080, () => {
     console.log('服务器已启动');
 
