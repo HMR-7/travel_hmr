@@ -264,6 +264,7 @@
     </view>
     <!-- 用户日志发布区域 -->
     <view
+      v-if="log==1"
       @tap="toWriteLog"
       class="iconfont icon-tianxie"
       style="color:var(--themeColor);font-size:80rpx;position: fixed;top: 80%;left: 86%;background-color: var(--contentBgc);border-radius: 100%;background: rgba(0,0,0,0);}"
@@ -483,15 +484,17 @@ export default {
       }
     },
     /* 获取旅游日志推荐表 */
-    getTravelLog() {
+    getTravelLog(page1) {
       let t = this,
         list = t.traevlList,
-        page = t.page;
+        page = t.page;;
+        if(page1) page =page1
       let data = {
-        page: t.page,
+        page: page,
         limit: 5,
         good_id: t.good_id
       };
+      
       t.$utils.ajax(t.$api.getTravelLog, "get", data, res => {
         console.log(res, "旅游日志后端返回值");
         t.traevlLength = res.length;
@@ -619,7 +622,7 @@ export default {
         t.$utils.showToast("点评成功！");
         setTimeout(() => {
           t.traevlList = [];
-          t.getTravelLog();
+          t.getTravelLog(1);
           t.writeLog = false;
           console.log(1111);
           // uni.switchTab({

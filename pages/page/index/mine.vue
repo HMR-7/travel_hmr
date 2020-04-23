@@ -96,6 +96,7 @@ export default {
   onShow() {
     let t = this;
     t.getListNum();
+    t.getDataBase();
   },
   onLoad() {
     let t = this;
@@ -164,11 +165,23 @@ export default {
         url: "./search?log=1"
       });
     },
-    toAdmin(){
+    toAdmin() {
       uni.navigateTo({
-         url: './admin'
+        url: "./admin"
       });
-   }
+    },
+    getDataBase() {
+      let t = this,
+        isAdmin = uni.getStorageSync("isAdmin");
+      console.log(111);
+      let data = {
+        isAdmin: isAdmin
+      };
+      t.$utils.ajax(t.$api.isAdminCheck, "get", data, res => {
+        console.log(res, "管理员查询");
+        uni.setStorageSync("rightContent", res);
+      });
+    }
   }
 };
 </script>

@@ -32,7 +32,8 @@ var conn = mysql.createConnection({
     port: "3306",
     user: "hmr_nbxinyitec_c",
     password: "Y84fxkca3GFHe3St",
-    database: "hmr_nbxinyitec_c"
+    database: "hmr_nbxinyitec_c",
+    charset:'UTF8Mb4_GENERAL_CI'
 });
 //2.发送请求(查询)
 /* 查询用户是否已经注册完毕， */
@@ -155,9 +156,7 @@ app.get("/detail", function (req, res) {
     let limit = Number(data.page - 1) * Number(data.limit);
     const sql = "SELECT * FROM detail limit " + limit + "," + data.limit;
     conn.query(sql, function (err, result) {
-        if (err) {
-            console.log("连接失败", err);
-        } else {
+        if (err) {} else {
             let _res = JSON.stringify(result)
             let data = JSON.parse(_res)
             res.send(data);
@@ -223,9 +222,7 @@ app.get("/getKeyWordSearchList", function (req, res) {
     let limit = Number(reData.page - 1) * Number(reData.limit);
     const sql = "SELECT * FROM detail where good_name like '%" + reData.keyword + "%' limit " + limit + "," + reData.limit;
     conn.query(sql, function (err, result) {
-        if (err) {
-            console.log("连接失败", err);
-        } else {
+        if (err) {} else {
             let _res = JSON.stringify(result)
             let data = JSON.parse(_res)
             res.send(data);
@@ -491,7 +488,6 @@ app.post("/userFooter", function (req, res) {
                 }] = _data;
                 console.log(id);
 
-                console.log('已经在足迹列表中');
                 let nowtime = Math.floor(new Date().getTime() / 1000);
                 const updatesql = "update footer set time = " + nowtime + " where id=" + id
                 console.log(updatesql);
@@ -686,7 +682,244 @@ app.post("/addFoodMegs", function (req, res) {
     })
 
 })
+/* 管理员删除美食推荐信息 */
+app.post("/delFoodMegs", function (req, res) {
+    var data = "";
+    req.on('data', function (chunk) {
+        data += chunk;
+    })
+    req.on('end', function () {
+        data = JSON.parse(data)
+        console.log(data, '管理员删除日志信息post请求接受前端传递的参数');
+        const deltsql = "delete from food where id= " + data.foodId
+        conn.query(deltsql, function (err, result) {
+            if (err) {
+                console.log(err);
+                res.send({
+                    msg: "删除失败!!",
+                    flag: 'no'
+                });
+            } else {
+                res.send({
+                    msg: "删除成功!!",
+                    flag: 'yes'
+                });
+
+            }
+        })
+        return
+    })
+})
+//管理员删除日志信息
+app.post("/toDelLogMegs", function (req, res) {
+    var data = "";
+    req.on('data', function (chunk) {
+        data += chunk;
+    })
+    req.on('end', function () {
+        data = JSON.parse(data)
+        console.log(data, '管理员删除日志信息post请求接受前端传递的参数');
+        const deltsql = "delete from travellog where id= " + data.logId
+        conn.query(deltsql, function (err, result) {
+            if (err) {
+                console.log(err);
+                res.send({
+                    msg: "删除失败!!",
+                    flag: 'no'
+                });
+            } else {
+                res.send({
+                    msg: "删除成功!!",
+                    flag: 'yes'
+                });
+
+            }
+        })
+        return
+    })
+})
+/* 管理员删除用户注册信息 */
+app.post("/toDelUserMegs", function (req, res) {
+    var data = "";
+    req.on('data', function (chunk) {
+        data += chunk;
+    })
+    req.on('end', function () {
+        data = JSON.parse(data)
+        if (data.isAdmin == 1) {
+            res.send({
+                msg: "管理员用户无法删除!!"
+            })
+            return;
+        }
+        console.log(data, '管理员删除用户注册信息post请求接受前端传递的参数');
+        const deltsql = "delete from userInfo where id= " + data.userId
+        conn.query(deltsql, function (err, result) {
+            if (err) {
+                console.log(err);
+                res.send({
+                    msg: "删除失败!!",
+                    flag: 'no'
+                });
+            } else {
+                res.send({
+                    msg: "删除成功!!",
+                    flag: 'yes'
+                });
+
+            }
+        })
+        return
+    })
+})
+/* 管理员删除景点信息 */
+app.post("/toDelGoodDetail", function (req, res) {
+    var data = "";
+    req.on('data', function (chunk) {
+        data += chunk;
+    })
+    req.on('end', function () {
+        data = JSON.parse(data)
+        console.log(data, '管理员删除用户注册信息post请求接受前端传递的参数');
+        const deltsql = "delete from detail where id= " + data.goodId
+        conn.query(deltsql, function (err, result) {
+            if (err) {
+                console.log(err);
+                res.send({
+                    msg: "删除失败!!",
+                    flag: 'no'
+                });
+            } else {
+                res.send({
+                    msg: "删除成功!!",
+                    flag: 'yes'
+                });
+
+            }
+        })
+        return
+    })
+})
+/* 管理员删除酒店信息 */
+app.post("/toDelHotelDetail", function (req, res) {
+    var data = "";
+    req.on('data', function (chunk) {
+        data += chunk;
+    })
+    req.on('end', function () {
+        data = JSON.parse(data)
+        console.log(data, '管理员删除酒店信息post请求接受前端传递的参数');
+        const deltsql = "delete from hotel where id= " + data.hotelId
+        conn.query(deltsql, function (err, result) {
+            if (err) {
+                console.log(err);
+                res.send({
+                    msg: "删除失败!!",
+                    flag: 'no'
+                });
+            } else {
+                res.send({
+                    msg: "删除成功!!",
+                    flag: 'yes'
+                });
+
+            }
+        })
+        return
+    })
+})
+/* 管理员更改酒店信息 */
+app.post('/toUpdateHotelMegs', function (req, res) {
+    var data = "";
+    req.on('data', function (chunk) {
+        data += chunk;
+    })
+    req.on('end', function () {
+        data = JSON.parse(data)
+        console.log(data, '管理员更改酒店信息post请求接受前端传递的参数');
+        let time = new Date().getTime();
+        var deltsql = "update hotel set time=" + time
+        if (data.hotelName) {
+            deltsql += " , " + "hotel_name='" + data.hotelName + "'"
+        }
+        if (data.hotelPrice) {
+            deltsql += " , " + "hotel_price=" + data.hotelPrice
+        }
+        deltsql += " " + "where id=" + data.hotelId
+        console.log(deltsql, 'sql');
+
+        conn.query(deltsql, function (err, result) {
+            if (err) {
+                console.log(err);
+                res.send({
+                    msg: "更改失败!!",
+                    flag: 'no'
+                });
+            } else {
+                res.send({
+                    msg: "更改成功!!",
+                    flag: 'yes'
+                });
+
+            }
+        })
+        return
+    })
+})
+/* 管理员更改景点信息 */
+app.post('/toUpdateGoodMegs',function(req,res){
+    var data = "";
+    req.on('data', function (chunk) {
+        data += chunk;
+    })
+    req.on('end', function () {
+        data = JSON.parse(data)
+        console.log(data, '管理员更改景点信息post请求接受前端传递的参数');
+        let time = new Date().getTime();
+        var sql = "update detail set time=" + time
+        if (data.goodName) {
+            sql += " , " + "good_name='" + data.goodName + "'"
+        }
+        if (data.goodIntroduce) {
+            sql += " , " + "introduce=" + data.goodIntroduce
+        }
+        sql += " " + "where id=" + data.goodId
+        console.log(sql, 'sql');
+
+        conn.query(sql, function (err, result) {
+            if (err) {
+                console.log(err);
+                res.send({
+                    msg: "更改失败!!",
+                    flag: 'no'
+                });
+            } else {
+                res.send({
+                    msg: "更改成功!!",
+                    flag: 'yes'
+                });
+
+            }
+        })
+        return
+    })
+})
+/* 图片上传 */
+app.post("/test", function (req, res) {
+    var data = "";
+    req.on('data', function (chunk) {
+        data += chunk;
+    })
+    req.on('end', function () {
+        data = JSON.parse(data)
+        let form = new multiparty.Form();
+        form.parse(req, function (err, fields) {
+            console.log(fields);
+        })
+        console.log(data, '管理员删除酒店信息post请求接受前端传递的参数');
+    })
+})
 app.listen(10080, () => {
-    console.log('服务器已启动');
+    console.log('服务已启动');
 
 });

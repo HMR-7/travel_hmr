@@ -168,7 +168,7 @@ export default {
               }, 1000);
               return;
             } else if (res.msg == false) {
-              let nickName = uni.getStorageSync('userInfo').nickName
+              let nickName = uni.getStorageSync("userInfo").nickName;
               let data = {
                 openid: t.openid,
                 userName: nickName,
@@ -177,7 +177,6 @@ export default {
               t.$utils.ajax(t.$api.insertuserInfo, "post", data, res => {
                 console.log(res, "999999999");
                 uni.setStorageSync("UserId", res[0].id);
-
                 uni.switchTab({
                   url: "../index/index"
                 });

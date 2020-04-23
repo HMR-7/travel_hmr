@@ -2,8 +2,9 @@
 // const http = 'http://192.168.88.121:3000/'
 // const http = 'https://120.53.93.29:3000/'
 /* 家用地址 */
-const http = 'https://hmr.nbxinyitec.com/'
-
+// const http = 'https://hmr.nbxinyitec.com/'
+/* 自己的域名 */
+const http = 'https://travel.backend.huangmaorui.cn/'
 const api = {
     userInfo: http + 'userInfo', //用户登录
     insertuserInfo: http + 'insertuserInfo',
@@ -21,7 +22,14 @@ const api = {
     getFoodList: http + 'getFoodList', //获取本地美食推荐
     getTravelLog: http + 'getTravelLog', //获取旅游日志
     isAdminCheck: http + 'isAdminCheck', //管理员查询
-    addFoodMegs :http + 'addFoodMegs' //管理员添加食物信息
+    addFoodMegs: http + 'addFoodMegs', //管理员添加食物信息
+    delFoodMegs: http + 'delFoodMegs', //管理员删除食物信息
+    toDelLogMegs: http + 'toDelLogMegs', //管理员删除用户日志信息
+    toDelUserMegs: http + 'toDelUserMegs', //管理员删除用户注册信息
+    toDelGoodDetail: http + 'toDelGoodDetail', //管理员删除景点信息
+    toUpdateGoodMegs: http + 'toUpdateGoodMegs', //管理员更改景点信息
+    toDelHotelDetail: http + 'toDelHotelDetail', //管理员删除酒店信息
+    toUpdateHotelMegs: http + 'toUpdateHotelMegs' //管理员更改酒店信息
 }
 
 export default api
