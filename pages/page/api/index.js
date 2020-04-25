@@ -6,6 +6,7 @@
 /* 自己的域名 */
 const http = 'https://travel.backend.huangmaorui.cn/'
 const api = {
+    getOpenid:http + 'getOpenid',//获取openid
     userInfo: http + 'userInfo', //用户登录
     insertuserInfo: http + 'insertuserInfo',
     detail: http + 'detail', // 用户登录
@@ -29,7 +30,7 @@ const api = {
     toDelGoodDetail: http + 'toDelGoodDetail', //管理员删除景点信息
     toUpdateGoodMegs: http + 'toUpdateGoodMegs', //管理员更改景点信息
     toDelHotelDetail: http + 'toDelHotelDetail', //管理员删除酒店信息
-    toUpdateHotelMegs: http + 'toUpdateHotelMegs' //管理员更改酒店信息
+    toUpdateHotelMegs: http + 'toUpdateHotelMegs', //管理员更改酒店信息
 }
 
 export default api

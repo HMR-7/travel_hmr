@@ -1,5 +1,6 @@
 const express = require("express");
 const mysql = require("mysql");
+const request = require("request")
 // const cors = require("cors")
 var app = express();
 var conn = mysql.createConnection({
@@ -33,9 +34,26 @@ var conn = mysql.createConnection({
     user: "hmr_nbxinyitec_c",
     password: "Y84fxkca3GFHe3St",
     database: "hmr_nbxinyitec_c",
-    charset:'UTF8Mb4_GENERAL_CI'
+    charset: 'UTF8Mb4_GENERAL_CI'
 });
 //2.发送请求(查询)
+/* 获取openid */
+app.get("/getOpenid", function (req, res) {
+    let reData = req.query;
+    console.log(reData, '获取openid时前端接受的code码');
+    var code = reData.js_code;
+    var APP_URL = 'https://api.weixin.qq.com/sns/jscode2session'
+    var APP_ID = 'wx4e740748bfb8fd79' //小程序的app id ，在公众开发者后台可以看到
+    var APP_SECRET = 'b40ac022a8da6d7f562ae5c93f1871d8' //小程序的app secrect，在公众开发者后台可以看到
+
+    if (!!code) {
+        request(`${APP_URL}?appid=${APP_ID}&secret=${APP_SECRET}&js_code=${code}&grant_type=authorization_code`, (error, response, body) => {
+            //console.log('statusCode:', response && response.statusCode)
+            console.log(body)
+            res.end(body)
+        })
+    }
+})
 /* 查询用户是否已经注册完毕， */
 app.get("/userInfo", function (req, res) {
     let Sqldata = req.query;
@@ -867,7 +885,7 @@ app.post('/toUpdateHotelMegs', function (req, res) {
     })
 })
 /* 管理员更改景点信息 */
-app.post('/toUpdateGoodMegs',function(req,res){
+app.post('/toUpdateGoodMegs', function (req, res) {
     var data = "";
     req.on('data', function (chunk) {
         data += chunk;

@@ -172,9 +172,6 @@ export default {
         page: page,
         limit: 5
       };
-      // let data = {
-      //   title: "景区"
-      // };
       t.$utils.ajax(t.$api.detail, "get", data, res => {
         /* 数组拼接 */
         list = list.concat(res);
@@ -187,7 +184,6 @@ export default {
             title: "没有更多了",
             icon: "none",
             duration: 2000,
-
             success: () => {
               t.page--;
             }

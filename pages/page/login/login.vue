@@ -134,18 +134,12 @@ export default {
     getUserChart() {
       let t = this;
       let data = {
-        appid: "wx4e740748bfb8fd79",
-        secret: "b40ac022a8da6d7f562ae5c93f1871d8",
-        js_code: t.code,
-        grant_type: "authorization_code"
-      };
-      t.$utils.ajax(
-        "https://api.weixin.qq.com/sns/jscode2session",
-        "get",
-        data,
-        res => {
-          console.log(res.openid, "获取openid");
-          t.openid = res.openid;
+        js_code:t.code
+      }
+      t.$utils.ajax(t.$api.getOpenid, "get", data, res => {
+        console.log(res,'获取openid');
+        t.openid = res.openid;
+        uni.setStorageSync('openid', res.openid);
           let data = {
             openid: res.openid
           };
@@ -184,8 +178,9 @@ export default {
               console.log(t.userRes);
             }
           });
-        }
-      );
+        
+    
+      });
     },
     /* 授权登录 */
     getUserInfo(e) {

@@ -936,7 +936,6 @@ export default {
       color: #00a2ff;
       font-size: 26rpx;
       text-align: center;
-      display: inline-block;
     }
   }
 
@@ -1045,6 +1044,7 @@ export default {
       max-height: 160rpx;
       color: #292c32;
       font-size: 28rpx;
+      box-sizing:border-box;
     }
 
     .openTag {
