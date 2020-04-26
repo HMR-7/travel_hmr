@@ -392,7 +392,7 @@ export default {
       };
       t.$utils.ajax(t.$api.getSwiper, "get", data, res => {
         console.log(res);
-        t.cardImg = res[0].src;
+        t.cardImg =  res[0].src;
         t.goodDetail = res[0];
         t.imgArr = res[0].swipeArr;
         if (t.user_id) {
