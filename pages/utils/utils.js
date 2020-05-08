@@ -52,17 +52,6 @@ const utils = {
       }
     })
   },
-  // 二维码格式化
-  getURLComponent(object) {
-    let r = decodeURIComponent(object).split('&')
-    var newArr = {}
-    for (let i = 0; i < r.length; i++) {
-      let kye = r[i].split('=')[0]
-      let value = r[i].split('=')[1]
-      newArr[kye] = value
-    }
-    return newArr
-  },
   /* 一键复制 */
   setClipboardData(str) {
     console.log(str,'strstr');
@@ -100,78 +89,7 @@ const utils = {
     });
   },
   // ajax请求
-  /* ajax: function (url, method, data, resolve) {
-    var f = utils.apiCannotLoading(url)
-    if (!f) {
-      utils.showLoading()
-    }
-    if (!data) {
-      data = {}
-    }
-    let userInfo = uni.getStorageSync('userInfo')
-    console.log('userInfo', userInfo)
-    if (userInfo) {
-      data.user_id = userInfo.id
-      data.sign = userInfo.sign
-      data.openid = userInfo.openid
-    }
-    console.log('请求开始数据打印---------------')
-    console.log(data)
-    uni.request({
-      url: api.config.url + url, //仅为示例，并非真实接口地址。
-      method: method,
-      data: data,
-      header: {
-        "Yuyuan-Api": "yuyuan-api",
-        "content-type": "application/x-www-form-urlencoded",
-        "request-header": "YuYuanApi"
-      },
-      success: (res) => {
-        // uni.hideLoading();
-        let statusCode = res.statusCode
-        if (statusCode === 500) {
-          if (url == 'userLogin') {
-            resolve()
-            return
-          }
-          utils.showToast('网络异常, 请稍后重试', false)
-          return
-        }
-        let r = res.data,
-          code = r.code
-        console.log('请求结束数据返回---------------', res)
-        console.log("code", code);
-        if (code == 40001) {
-          utils.showToast(r.msg, false)
-          return
-
-        }
-        if (code == 100000) {
-          utils.showToast(r.msg, false)
-          setTimeout(() => {
-            uni.redirectTo({
-              url: '/pages/page/login/login',
-              complete: function (res) {
-                console.log(res)
-              }
-            })
-          }, 1100)
-        }
-        if (code == 0) {
-          utils.showToast(r.msg, false)
-        } else {
-          if (resolve) {
-            resolve(r.data, code, r.msg)
-          }
-        }
-      },
-    });
-  }, */
   ajax: function (url, method, data, resolve) {
-    // console.log(url, 'uel');
-    // console.log(method, 'method');
-    // console.log(data, 'data');
-    // console.log(resolve, 'resolve');
     if (!data) {
       data = {}
     }
@@ -282,6 +200,7 @@ const utils = {
       }
     })
   },
+  // 检查是否已经登陆
   checkLogin(fn) {
     // let us = uni.getStorageSync('userInfo')
     let us = uni.getStorageSync('UserId');

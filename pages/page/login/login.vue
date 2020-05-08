@@ -121,7 +121,6 @@ export default {
           console.log(res, "res");
           if (res.code) {
             console.log(t.code, "t.code");
-
             t.code = res.code;
             t.getUserChart();
           } else {

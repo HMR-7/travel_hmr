@@ -21,10 +21,10 @@ var conn = mysql.createConnection({
 }); */
 //连接数据库
 // var conn = mysql.createConnection({
-//     host: "192.168.88.121",
+//     host: "120.55.93.29",
 //     port: "3306",
-//     user: "root",
-//     password: "123456",
+//     user: "hmr",
+//     password: "101216",
 //     database: "travel"
 // });
 /* 连接个人服务器数据库 */

@@ -133,21 +133,19 @@ export default {
     let t = this;
     t.getIndexGoodsList();
     console.log(t.goodsList, "首页推荐列表");
-
-    // let time = t.test(t.getIndexGoodsList);
-    // console.log(time, "函数执行时间");
+    /* let time = t.test(t.getIndexGoodsList);
+    console.log(time, "函数执行时间"); */
   },
 
   methods: {
-    test(fn) {
+  /*   test(fn) {
       let start = new Date().getTime();
       console.log(start);
       fn();
       let end = new Date().getTime();
       console.log(end);
       return end - start + "ms";
-    },
-    
+    }, */
     /* 一键复制 */
     Copy(str) {
       let t = this;

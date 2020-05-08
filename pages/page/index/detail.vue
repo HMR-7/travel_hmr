@@ -15,26 +15,28 @@
       >保存</button>
     </van-popup>
     <!-- 轮播图 -->
-    <swiper
-      class="img-container"
-      indicator-dots="true"
-      indicator-color="var(--detailColor)"
-      indicator-active-color="var(--themeColor)"
-      circular
-      autoplay
-    >
-      <block v-for="(item, index) in imgArr" :key="index">
-        <swiper-item class="item">
-          <!-- <view class="swiper_title">{{item.title}}</view> -->
-          <image
-            class="itemImg"
-            :class="{active:currentIndex==index}"
-            :src="item"
-            @tap="previewImage(imgArr,item,index)"
-          />
-        </swiper-item>
-      </block>
-    </swiper>
+    <view style="position :relative">
+      <swiper
+        class="img-container"
+        indicator-dots="true"
+        indicator-color="var(--detailColor)"
+        indicator-active-color="var(--themeColor)"
+        circular
+        autoplay
+      >
+        <block v-for="(item, index) in imgArr" :key="index">
+          <swiper-item class="item">
+            <!-- <view class="swiper_title">{{item.title}}</view> -->
+            <image
+              class="itemImg"
+              :class="{active:currentIndex==index}"
+              :src="item"
+              @tap="previewImage(imgArr,item,index)"
+            />
+          </swiper-item>
+        </block>
+      </swiper>
+    </view>
     <!-- 景点简介部分 -->
     <view class="megs_box mar_bottom">
       <view class="header">
@@ -378,10 +380,6 @@ export default {
     t.getFoodList();
     t.getTravelLog();
   },
-  mounted() {
-    let t = this;
-  },
-
   methods: {
     /* 获取商品详情 */
     getGoodDetail() {
@@ -392,7 +390,7 @@ export default {
       };
       t.$utils.ajax(t.$api.getSwiper, "get", data, res => {
         console.log(res);
-        t.cardImg =  res[0].src;
+        t.cardImg = res[0].src;
         t.goodDetail = res[0];
         t.imgArr = res[0].swipeArr;
         if (t.user_id) {
@@ -487,14 +485,14 @@ export default {
     getTravelLog(page1) {
       let t = this,
         list = t.traevlList,
-        page = t.page;;
-        if(page1) page =page1
+        page = t.page;
+      if (page1) page = page1;
       let data = {
         page: page,
         limit: 5,
         good_id: t.good_id
       };
-      
+
       t.$utils.ajax(t.$api.getTravelLog, "get", data, res => {
         console.log(res, "旅游日志后端返回值");
         t.traevlLength = res.length;
@@ -793,17 +791,29 @@ export default {
 
 <style lang="less">
 .content {
-  [v-cloak] {
-    display: none;
-  }
-
   width: 100%;
   min-height: 100vh;
   padding-bottom: 150rpx;
   background-color: var(--contentBgc);
-
+  .icon-guanzhu1 {
+    color: #dd524d !important;
+  }
   .mar_bottom {
     margin-bottom: 20rpx;
+  }
+  .dots {
+    position: absolute;
+    left: calc(50% - 80rpx);
+    bottom: 10rpx;
+    .isDots {
+      display: inline-block;
+      margin: 0 10rpx;
+      font-size: 16rpx;
+      width: 15rpx;
+      height: 15rpx;
+      line-height: 15rpx;
+      background-color: rgba(0, 0, 0, 0.2);
+    }
   }
 
   /* 轮播图 */
@@ -1044,7 +1054,7 @@ export default {
       max-height: 160rpx;
       color: #292c32;
       font-size: 28rpx;
-      box-sizing:border-box;
+      box-sizing: border-box;
     }
 
     .openTag {

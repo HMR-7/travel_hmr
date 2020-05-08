@@ -5,7 +5,7 @@
       <view class="list_show">
         <!-- 信息展示模块 -->
         <view class="goods" v-for="(item,index) in goodsList" :key="index">
-          <view class="top" @tap="toDetail(item.id)">
+          <view class="top" @tap="toDetail(item.id,item.good_name)">
             <image :src="item.src" />
           </view>
           <view class="bottom">
@@ -20,11 +20,18 @@
       </view>
     </view>
     <!-- 搜索成功但是数据库无内容时到现实内容 -->
-    <view class="nolist" v-if="isShow==0">
-      <view class="iconfont icon-aidongman"></view>
-      <span style="font-size:40rpx;font-weight:bolder">非常抱歉，暂无您需要的信息</span>
-      <navigator url="./index" redirect hover-class="className">再去看看</navigator>
-      <!-- <view class="goOut"></view> -->
+    <view class="nolist" v-if="isShow==0" style="margin:auto">
+      <view
+        class="iconfont icon-aidongman"
+        style="text-align: center;font-size: 150rpx;margin-bottom: 20rpx;"
+      ></view>
+      <view style="font-size:40rpx;font-weight:bolder;text-align:center">非常抱歉，暂无您需要的信息</view>
+      <navigator
+        url="./index"
+        redirect
+        hover-class="className"
+        style="color: #fff;background-color: var(--themeColor);text-align: center;width: 150rpx;margin: 0 auto;padding: 10rpx;border-radius: 20rpx;margin-top: 50rpx;"
+      >再去看看</navigator>
     </view>
     <!-- 搜索过渡现实页面 -->
     <view class="loading" v-if="isShow==-1">
@@ -226,17 +233,6 @@ export default {
       font-size: 200rpx;
     }
     .goOut {
-      margin-top: 20rpx;
-      margin-bottom: 500rpx;
-      width: 240rpx;
-      height: 80rpx;
-      line-height: 80rpx;
-      text-align: center;
-      color: #636773;
-      font-size: 32upx;
-      font-weight: bolder;
-      border: 3rpx solid #c7c7d5;
-      background-color: #fff;
     }
   }
   .loading {
