@@ -771,7 +771,7 @@ app.post("/toDelUserMegs", function (req, res) {
             return;
         }
         console.log(data, '管理员删除用户注册信息post请求接受前端传递的参数');
-        const deltsql = "delete from userInfo where id= " + data.userId
+        const deltsql = "delete from userinfo where id=" + data.userId
         conn.query(deltsql, function (err, result) {
             if (err) {
                 console.log(err);

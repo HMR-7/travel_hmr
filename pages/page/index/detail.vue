@@ -89,39 +89,6 @@
         >门票价：{{goodDetail.good_price}}元/起</view>
       </view>
     </view>
-    <!-- 门票信息-使用自定义滑动组件 -->
-    <!-- <swiper-action @swiperAction="handleSwiperAction">
-      <view class="TicketMegs">
-        <view class="title">门票信息</view>
-        <view class="TicketPrice">
-          <view class="PriceTitle">
-            成人票
-            <view
-              v-if="goodDetail.good_price==undefined"
-              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor); "
-            >￥--元/起</view>
-            <view
-              v-if="goodDetail.good_price!=undefined"
-              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor); "
-            >￥{{goodDetail.good_price}}元/起</view>
-          </view>
-        </view>
-        <view class="TicketPrice">
-          <view class="PriceTitle">
-            儿童票
-            <view
-              v-if="goodDetail.childTicket==undefined"
-              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
-            >￥--元/起</view>
-            <view
-              v-if="goodDetail.childTicket!=undefined"
-              style="font-size:24rpx;font-weight:bolder;color: var(--priceColor);"
-            >￥{{goodDetail.childTicket}}元/起</view>
-          </view>
-        </view>
-        <view class="selMorePrice">详情可到景区售票处询问</view>
-      </view>
-    </swiper-action>-->
     <view v-if="!log">
       <!-- 门票信息 -->
       <view class="TicketMegs">
@@ -415,19 +382,22 @@ export default {
     hotelDetail(id) {
       let t = this,
         hotelList = t.hotelList;
+      console.log(hotelList, "hotelListhotelList");
+
       console.log(t.hotelDetailMegs, "hotelDetailMegs");
-      if (t.hotelDetailMegs) {
-        if (!t.hotelDetailMegs.src) {
-          hotelList.some(v => {
-            if (v.id == id) {
-              console.log(v, "vvvvvvv");
-              let hotelimgArr = v.src.split(",");
-              v.src = hotelimgArr;
-              t.hotelDetailMegs = v;
-              return v;
-            }
-          });
-        }
+      t.hotelDetailMegs = [];
+      console.log(id, "ididid");
+      if (!t.hotelDetailMegs.src) {
+        hotelList.some(v => {
+          if (v.id === id) {
+            console.log(v, "vvvvvvv");
+            let hotelimgArr = v.src.split(",");
+            v.src = hotelimgArr;
+            t.hotelDetailMegs = v;
+            console.log(t.hotelDetailMegs);
+            return true;
+          }
+        });
       }
       console.log(t.hotelDetailMegs, "酒店信息");
       if (t.hotelDetailMegs) {
@@ -451,6 +421,8 @@ export default {
       t.$utils.ajax(t.$api.getFoodList, "get", data, res => {
         list = [...list, ...res];
         console.log(list, "美食推荐列表");
+        console.log(list);
+
         if (list.length == 0 && page == 1) {
           console.log(111);
         }

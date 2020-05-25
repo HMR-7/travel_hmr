@@ -2,8 +2,6 @@
   <view class="content" v-if="isLogin">
     <!-- 用户信息展示模块 -->
     <view class="top_header" @tap="toPerMegs(userInfo.id)">
-      <!-- 详情箭头 -->
-      <view class="arrows"></view>
       <!-- 用户头像 -->
       <image class="header" :src="userInfo.avatarUrl" @tap="toEdit" />
       <!-- 用户昵称、所在城市 -->
@@ -56,8 +54,8 @@
     </view>
     <!-- 电话客服 -->
     <van-popup :show="show" position="bottom" @close="show=!show">
-      <view class="contactWay" @tap="Call(sysInfo.phone)">手机号：{{sysInfo.phone}}</view>
-      <view class="contactWay" @tap="Copy(sysInfo.wxNum)">微信：{{sysInfo.wxNum}}</view>
+      <view class="contactWay" @tap="Call(phone)">手机号：{{phone}}</view>
+      <view class="contactWay" @tap="Copy(wxNum)">微信：{{wxNum}}</view>
     </van-popup>
   </view>
 </template>
@@ -72,7 +70,8 @@ export default {
       listNum: "", //用户已收藏、足迹列表数量
       show: false, //显示电话客服
       isLogin: false,
-      sysInfo: ""
+      phone: "17853558905",
+      wxNum: "huangmaorui102117"
     };
   },
   onPullDownRefresh() {
@@ -165,11 +164,13 @@ export default {
         url: "./search?log=1"
       });
     },
+    /* 跳转管理员页面 */
     toAdmin() {
       uni.navigateTo({
         url: "./admin"
       });
     },
+    /* 管理员请求数据 */
     getDataBase() {
       let t = this,
         isAdmin = uni.getStorageSync("isAdmin");

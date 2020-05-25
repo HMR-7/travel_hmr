@@ -28,7 +28,7 @@
             <view v-text="item.isAdmin==1?'Yes':'No'"></view>
             <view>
               <view
-                @tap="toDelUserMegs(item.id,showList)"
+                @tap="toDelUserMegs(item.id,showList,item.isAdmin)"
                 style="color:#fff;width:90%;background-color:#dd524d;border-radius:10rpx;"
               >删除</view>
             </view>
@@ -108,7 +108,10 @@
             <text>操作</text>
           </view>
           <view class="goods_list list_food" v-for="(item,index) in showList" :key="index">
-            <view>{{item.food_name}}</view>
+            <view
+              @tap="toShowFoodAddr(item.food_address)"
+              style="text-decoration:underline"
+            >{{item.food_name}}</view>
             <view
               @tap="toDelFoodMegs(item.id,showList)"
               style="color:#fff;background-color:#dd524d;border-radius:10rpx;"
@@ -123,7 +126,7 @@
       </scroll-view>
       <van-popup
         :show="isToaddFoodVal"
-        position="bottom"
+        position="top"
         custom-style="height: 20%"
         @close="isToaddFoodVal=false"
       >
@@ -227,6 +230,15 @@
           style="background-color:var(--themeColor);color:#fff;"
         >提交</view>
       </van-popup>
+      <van-popup
+        :show="isShowFoodAddr"
+        position="top"
+        custom-style="padding: 20rpx 0;"
+        @close="isShowFoodAddr=false"
+      >
+        <view style="color:#dd524d;font-size:40rpx;font-weight:bolder;text-align:center">推荐店家地址</view>
+        <view style="text-align:center">{{foodAddress}}</view>
+      </van-popup>
     </view>
   </view>
 </template>
@@ -238,6 +250,8 @@ export default {
   data() {
     return {
       article: "", //查看用户日志详情
+      foodAddress: "", //美食地址
+      isShowFoodAddr: false, //显示景点地址信息
       isUpdataGoodMegs: false, //显示更改景点信息弹窗
       isUpdataHotelMegs: false, //显示更改酒店信息弹窗
       newGoodName: "", //新的景点名称
@@ -266,8 +280,10 @@ export default {
   created() {
     let t = this;
     t.rightContent = uni.getStorageSync("rightContent");
+
     // t.getDataBase();
     t.showList = t.rightContent[0];
+    console.log(t.showList, "showList");
 
     t.rightContent[1].map((v, i, arr) => {
       v.time = moment(v.time).format("YYYY-M-DD");
@@ -277,16 +293,6 @@ export default {
   },
   onLoad(options) {
     let t = this;
-    // t.rightContent = uni.getStorageSync("rightContent");
-    // console.log(t.rightContent, "rightContentrightContentrightContent");
-    // if (t.rightContent.length > 0) {
-    //   t.rightContent[1].map((v, i, arr) => {
-    //     v.time = moment(v.time).format("YYYY-M-DD");
-    //     t.timeList = arr;
-    //     return arr;
-    //   });
-    // }
-    // const Cates = uni.getStorageSync("cates");
   },
   methods: {
     /* 分类页商品分类 */
@@ -303,6 +309,7 @@ export default {
       if (index == 1) {
         t.showList = t.timeList;
       } else {
+        t.showList = [];
         t.showList = t.rightContent[index];
         console.log(t.showList, "6666666");
       }
@@ -318,6 +325,10 @@ export default {
       t.$utils.ajax(t.$api.isAdminCheck, "get", data, res => {
         console.log(res, "管理员查询");
         uni.setStorageSync("rightContent", res);
+        t.rightContent = uni.getStorageSync("rightContent");
+        if (t.currentIndex == 4) {
+          t.showList = t.rightContent[4];
+        }
       });
     },
     showLogMegs(article) {
@@ -326,8 +337,13 @@ export default {
       console.log(article, "日志信息");
       t.article = article;
     },
+    toShowFoodAddr(food_address) {
+      let t = this;
+      t.isShowFoodAddr = true;
+      t.foodAddress = food_address;
+    },
     /* 管理员删除食品信息事件 */
-    toDelFoodMegs(id,Arr) {
+    toDelFoodMegs(id, Arr) {
       let t = this;
       console.log(Arr, "获取指定数组");
       console.log(id, "tiemtime");
@@ -366,6 +382,8 @@ export default {
         console.log(res, "插入信息");
         if (res.flag == "yes") {
           t.$utils.showToast("添加成功");
+          t.getDataBase();
+          t.isToaddFoodVal = false;
         }
       });
     },
@@ -390,11 +408,11 @@ export default {
       });
     },
     /* 管理员删除用户信息 */
-    toDelUserMegs(id, Arr) {
-      let t = this,
-        admin = uni.getStorageSync("isAdmin");
-      console.log(Arr, "获取指定数组");
-      console.log(id, "tiemtime");
+    toDelUserMegs(id, Arr, admin) {
+      let t = this;
+      console.log(id, "id");
+      console.log(admin, "admin");
+
       let data = {
         isAdmin: admin,
         userId: id
@@ -475,14 +493,6 @@ export default {
       };
       t.$utils.ajax(t.$api.toUpdateHotelMegs, "post", data, res => {
         console.log(res);
-
-        // Arr.map((v, i, arr) => {
-        //   if (v.id == id) {
-        //     arr.splice(i, 1);
-        //     return arr;
-        //   }
-        // });
-        // console.log(Arr, "删除之后的指定数组");
         t.$utils.showToast(res.msg);
 
         Arr.map((v, i, arr) => {
@@ -499,6 +509,7 @@ export default {
             }
             console.log(arr, "arrarr");
             t.showList = arr;
+            t.isUpdataHotelMegs = false;
             return arr;
           }
         });
@@ -543,6 +554,7 @@ export default {
             }
             console.log(arr, "arrarr");
             t.showList = arr;
+            t.isUpdataGoodMegs = false;
             return arr;
           }
         });
@@ -593,17 +605,6 @@ export default {
           text-align: center;
         }
       }
-      /* .goods_title {
-          display: flex;
-          font-size: var(--titleSize);
-          justify-content: center;
-          align-items: center;
-          height: 80rpx;
-          .delimiter {
-            color: #ccc;
-            padding: 0 10rpx;
-          }
-        } */
       .goods_list {
         margin-top: 20rpx;
         display: flex;

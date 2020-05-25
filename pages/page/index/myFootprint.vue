@@ -39,6 +39,8 @@
 </template>
 
 <script>
+import moment from "moment";
+moment.locale("zh-cn");
 export default {
   data() {
     return {
@@ -93,7 +95,7 @@ export default {
       t.$utils.ajax(t.$page.getFooterList, "get", data, res => {
         t.goodsList = res;
         list = list.concat(res);
-        console.log(list, "收藏商品列表");
+        console.log(list, "足迹列表");
         if (list.length == 0 && page == 1) {
           console.log(111);
         }
