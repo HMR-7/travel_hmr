@@ -138,14 +138,6 @@ export default {
   },
 
   methods: {
-  /*   test(fn) {
-      let start = new Date().getTime();
-      console.log(start);
-      fn();
-      let end = new Date().getTime();
-      console.log(end);
-      return end - start + "ms";
-    }, */
     /* 一键复制 */
     Copy(str) {
       let t = this;
@@ -172,7 +164,18 @@ export default {
       };
       t.$utils.ajax(t.$api.detail, "get", data, res => {
         /* 数组拼接 */
-        list = list.concat(res);
+        // console.log(t.$utils.pullRefresh(list, res, page).list, "7777777");
+        // console.log(t.$utils.pullRefresh(list, res, page).page, "9999999");
+
+        t.goodsList = t.$utils.pullRefresh(list, res, page).list;
+        t.page = t.$utils.pullRefresh(list, res, page).page;
+
+        // if (t.$utils.pullRefresh(list, res, page).page == 1) {
+        //   t.page--;
+        // }
+        // console.log(t.$utils.pullRefresh(list, res, page));
+
+        /* list = list.concat(res);
         console.log(list, "首页商品列表");
         if (list.length == 0 && page == 1) {
           console.log(111);
@@ -188,7 +191,7 @@ export default {
           });
         } else {
         }
-        t.goodsList = list;
+        t.goodsList = list; */
       });
     },
     /* 查看景点详情 */

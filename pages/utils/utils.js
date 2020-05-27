@@ -1,6 +1,29 @@
 // import * as api from '../siteinfo/siteinfo'
 
 const utils = {
+  /* 下拉刷新的封装 */
+  pullRefresh(list, res, page) {
+    var p = null;
+    console.log(page, '传递进来的page');
+    list = [...list, ...res]
+    if (list.length == 0 && page == 1) {
+      console.log("没有数据");
+    }
+    if (res.length == 0 && page > 1) {
+      console.log(111);
+      uni.showToast({
+        title: "没有更多了",
+        icon: "none",
+        duration: 2000,
+      });
+      page--
+      console.log(page, '最后的page');
+    } else {}
+    return {
+      list: list,
+      page: page
+    }
+  },
   getSetting: (fn) => {
     let t = this;
     uni.getSetting({
@@ -84,9 +107,9 @@ const utils = {
         "custom-header": "application/x-www-form-urlencoded" //自定义请求头信息
       },
       success: (res) => {
-        console.log('请求数据打印---------');
+        // console.log('请求数据打印---------');
 
-        console.log(res.data);
+        // console.log(res.data);
         if (resolve) {
           resolve(res.data)
         }
