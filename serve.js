@@ -1,6 +1,7 @@
 const express = require("express");
 const mysql = require("mysql");
 const request = require("request")
+const fs = require('fs')
 // const cors = require("cors")
 var app = express();
 var conn = mysql.createConnection({
@@ -589,7 +590,6 @@ app.get("/getFoodList", function (req, res) {
         res.send(data)
     })
 })
-
 /* 获取用户日志模块列表 */
 app.get("/getTravelLog", function (req, res) {
     let reData = req.query;
@@ -613,7 +613,6 @@ app.get("/getTravelLog", function (req, res) {
     })
 
 })
-
 /* 管理员查询 */
 app.get("/isAdminCheck", function (req, res) {
     let reData = req.query;
@@ -923,18 +922,17 @@ app.post('/toUpdateGoodMegs', function (req, res) {
     })
 })
 /* 图片上传 */
-app.post("/test", function (req, res) {
+app.post("/upLoadImg", function (req, res) {
     var data = "";
     req.on('data', function (chunk) {
         data += chunk;
     })
     req.on('end', function () {
         data = JSON.parse(data)
-        let form = new multiparty.Form();
-        form.parse(req, function (err, fields) {
-            console.log(fields);
+        console.log(data);
+        res.send({
+            msg: 'ok'
         })
-        console.log(data, '管理员删除酒店信息post请求接受前端传递的参数');
     })
 })
 app.listen(10080, () => {
