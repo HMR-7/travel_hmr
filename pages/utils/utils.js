@@ -55,7 +55,7 @@ const utils = {
       title: str,
       icon: icon,
       image: img,
-      duration: 2000
+      duration: 3000
     });
   },
   showModal(str, fn, cancel) {

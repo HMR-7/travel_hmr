@@ -141,7 +141,6 @@ export default {
         t.$utils.ajax(t.$api.getSearchResult, "get", data, res => {
           console.log(res, "用户写文章时候的搜索结果");
           t.result_log = res;
-
           console.log(t.result_log, "t.result_log");
         });
       } else if (t.log == 0) {

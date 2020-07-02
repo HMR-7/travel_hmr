@@ -12,22 +12,6 @@ var conn = mysql.createConnection({
 //     methods: ['get', 'post'],
 //     allowedHeaders: ['Content-Type', 'Authorization']
 // }))
-/* 家用数据库 */
-/* var conn = mysql.createConnection({
-    host: "192.168.1.106",
-    port: "3306",
-    user: "root",
-    password: "123456",
-    database: "travel"
-}); */
-//连接数据库
-// var conn = mysql.createConnection({
-//     host: "120.55.93.29",
-//     port: "3306",
-//     user: "hmr",
-//     password: "101216",
-//     database: "travel"
-// });
 /* 连接个人服务器数据库 */
 var conn = mysql.createConnection({
     host: "127.0.0.1",
@@ -922,17 +906,13 @@ app.post('/toUpdateGoodMegs', function (req, res) {
     })
 })
 /* 图片上传 */
-app.post("/upLoadImg", function (req, res) {
-    var data = "";
-    req.on('data', function (chunk) {
-        data += chunk;
-    })
-    req.on('end', function () {
-        data = JSON.parse(data)
-        console.log(data);
-        res.send({
-            msg: 'ok'
-        })
+app.get("/upLoadImg", function (req, res) {
+    let reData = req.query;
+    const sql = 'select * from upload'
+    conn.query(sql, function (err, result) {
+        let _res = JSON.stringify(result)
+        let data = JSON.parse(_res)
+        res.send(data)
     })
 })
 app.listen(10080, () => {
